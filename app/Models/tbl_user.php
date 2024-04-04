@@ -5,13 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Usuarios extends Model
+class tbl_user extends Model
 {
     use HasFactory;
-    public function rol(){
-        return $this->belongsTo(tbl_roles::class);
-    }
-    public function grupos() {
-        return $this->belongsTo(tbl_grupos::class);
-    }
+    protected $table = 'tbl_user';
 }
