@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('tbl_grupos', function (Blueprint $table) {
             $table->id('id_gru');
             $table->string('nombre_gru')->nullable();
-            $table->integer('id_gim-lug_fk')->nullable();
+            $table->unsignedBigInteger('ind_gim')->nullable();
             $table->primary('id_gru');
+            $table->foreign('ind_gim')->references('id_gim')->on('tbl_gimcana')->onDelete('cascade');
         });
         
     }

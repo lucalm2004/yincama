@@ -19,19 +19,19 @@ class tbl_grupos extends Seeder
         DB::table("tbl_grupos")->insert([
             [
                 'nombre_gru' => 'Millogangsters',
-                // 'id_gim_lug_fk' => 1,
+                'ind_gim' => 1,
             ],
             [
                 'nombre_gru' => 'Los Bebesitos',
-                // 'id_gim_lug_fk' => 1,
+                'ind_gim' => 1,
             ],
             [
                 'nombre_gru' => 'Magics',
-                // 'id_gim_lug_fk' => 2,
+                'ind_gim' => 2,
             ],
             [
                 'nombre_gru' => 'Los Manes',
-                // 'id_gim_lug_fk' => 2,
+                'ind_gim' => 2,
             ],
        
         ]);

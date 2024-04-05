@@ -19,26 +19,26 @@ class tbl_check extends Seeder
         DB::table("tbl_check")->insert([
             [
                 'id_gim-lug_fk' => '1',
-                'id_user_fk' => '1',
+                'id_grupo_tabla' => '1',
                 
                
             ],
             [
                 'id_gim-lug_fk' => '1',
-                'id_user_fk' => '2',
+                'id_grupo_tabla' => '1',
                 
              
                
             ],
             [
                 'id_gim-lug_fk' => '1',
-                'id_user_fk' => '3',
+                'id_grupo_tabla' => '2',
                
                
             ],
             [
                 'id_gim-lug_fk' => '1',
-                'id_user_fk' => '4',
+                'id_grupo_tabla' => '2',
                 
               
             ],

@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('tbl_check', function (Blueprint $table) {
             $table->id('id_check');
             $table->unsignedBigInteger('id_gim-lug_fk');
-            $table->unsignedBigInteger('id_user_fk');
+            $table->unsignedBigInteger('id_grupo_tabla');
             $table->primary('id_check');
             $table->foreign('id_gim-lug_fk')->references('id_gim-lug')->on('tbl_gimcana-lugares')->onDelete('cascade');
-            $table->foreign('id_user_fk')->references('id_user')->on('tbl_usuario')->onDelete('cascade');
+            $table->foreign('id_grupo_tabla')->references('id_grupo_tabla')->on('tbl_grupos_user')->onDelete('cascade');
         });
         
     }

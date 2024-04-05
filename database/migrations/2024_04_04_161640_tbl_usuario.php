@@ -17,9 +17,7 @@ return new class extends Migration
             $table->string('correo_user')->nullable();
             $table->string('pwd_user')->nullable();
             $table->unsignedBigInteger('id_rol_fk');
-            $table->unsignedBigInteger('id_gru_fk')->nullable();
             $table->foreign('id_rol_fk')->references('id_rol')->on('tbl_roles')->onDelete('cascade');
-            $table->foreign('id_gru_fk')->references('id_gru')->on('tbl_grupos')->onDelete('cascade');
         });
         
     }
