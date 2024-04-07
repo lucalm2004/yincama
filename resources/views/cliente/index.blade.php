@@ -6,8 +6,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="{{ asset('/resources/js/script.js') }}"></script>
+
     <style>
-        body,
+       body,
         html {
             margin: 0;
             padding: 0;
@@ -60,8 +63,8 @@
     position: relative;
     border-radius: 1rem;
     margin: 19px;
-    opacity: 0; /* Inicialmente oculto */
-    transition: opacity 0.5s ease; /* TransiciÃ³n de opacidad */
+    opacity: 0; Inicialmente oculto
+    transition: opacity 0.5s ease; /* Transición de opacidad */
 }
 
 .popup-content.visible {
@@ -122,10 +125,8 @@
         <div id='button2' class='button'></div>
         <div id='button3' class='button'></div>
         <div id='button4' class='button'></div>
-        {{-- <div id='button5' class='button'></div> --}}
         <img src="{{asset('/img/estrella.png')}}" alt="Estrella favorita">
     </div>
-    
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
@@ -207,8 +208,151 @@ button4.onclick = function() {
 
 
 
+        var map = L.map('map', {
+            zoomControl: false
+        }).setView([41.3851, 2.1734], 13);
 
+   // Crear un marcador arrastrable y añadirlo al mapa
+// var marker = L.marker([41.3718036, 2.1693184], { draggable: true }).addTo(map);
+
+// // Agregar un evento para mostrar las coordenadas al arrastrar el marcador
+// marker.on('dragend', function(event) {
+//     var marker = event.target;
+//     var position = marker.getLatLng();
+//     alert('Marcador arrastrado a la ubicación: ' + position.lat + ', ' + position.lng);
+// });
+
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+
+        var marker1 = L.marker([41.3718036, 2.1693184]).addTo(map);
+    var marker2 = L.marker([41.3835454, 2.1020217]).addTo(map);
+    var marker3 = L.marker([41.4199715, 2.1642218]).addTo(map);
+    var marker4 = L.marker([41.4328272, 2.16272]).addTo(map);
+    var marker5 = L.marker([41.4189849, 2.1437153]).addTo(map);
+    
+    
+
+    // Array con todas las coordenadas guardadas
+    var coordenadas = [
+        [41.3718036,2.1693184,17],
+        [41.3835454,2.1020217,17],
+        [41.4199715,2.1642218,17],
+        [41.4328272,2.16272,17],
+        [41.4189849,2.1437153,17]
+    ];
+
+    marker1.on('mouseover', function (event) {
         
+    // this.bindPopup("<b>Parc del Mirador de Poble-Sec </b><br>Obert ⋅ Tanca a les 22:00<br>" +
+    //     "Província: Barcelona<br>Adreça: Passeig de Montjuic, s/n, 08005 Sants-Montjuic, Barcelona" +
+    //     "<br><img src='./img/parc_poblesec.webp' style='width: 80%' alt='Imagen 1'>" +
+    //     "<br><button class='rutaBtn'>Favorito</button>").openPopup();
+        document.querySelectorAll('.rutaBtn').forEach(function(btn) {
+            btn.addEventListener('click', function(event){
+                var control = L.Routing.control({
+                    waypoints: [
+                        L.latLng(41.3498804, 2.1096487),
+                        // El destino se establecerá dinámicamente al hacer clic en el mapa
+                    ],
+                    routeWhileDragging: true
+                }).addTo(map);
+                map.on('click', function (event) {
+                    var destino = event.latlng;
+                    control.spliceWaypoints(control.getWaypoints().length - 1, 1, destino);
+                });
+            });
+        });
+});
+
+
+
+marker2.on('mouseover', function (event) {
+    this.bindPopup("<div id='resultado'></div>").openPopup();
+        document.getElementById('rutaBtn').addEventListener('click', function(event){
+            // Añadir la capa de enrutamiento       
+            var control = L.Routing.control({     
+                waypoints: [      
+                L.latLng(41.3498804, 2.1096487),        
+                // El destino se establecerá dinámicamente al hacer clic en el mapa     
+            ],     routeWhileDragging: true,     }).addTo(map);      
+            // Agregar evento al mapa para establecer el destino al hacer clic    
+             map.on('click', function (event) {       var destino = event.latlng;       
+                control.spliceWaypoints(control.getWaypoints().length - 1, 1, destino);     });
+        
+        })
+});
+
+
+
+marker3.on('mouseover', function (event) {
+    this.bindPopup("<b>Parc del Guinardó</b><br>Obert ⋅ Tanca a les 20:00<br>" +
+        "Província: Barcelona<br>Adreça: Garriga i Roca, 1*13 , s/n, 08032 Horta-Guinardo, Barcelona" +
+        "<br><img src='./img/parc_guinardo.webp' style='width: 80%' alt='Imagen 1'>" +
+        "<br><button id='rutaBtn'>Favorito</button>").openPopup();
+        document.getElementById('rutaBtn').addEventListener('click', function(event){
+            // Añadir la capa de enrutamiento       
+            var control = L.Routing.control({     
+                waypoints: [      
+                L.latLng(41.3498804, 2.1096487),        
+                // El destino se establecerá dinámicamente al hacer clic en el mapa     
+            ],     routeWhileDragging: true,     }).addTo(map);      
+            // Agregar evento al mapa para establecer el destino al hacer clic    
+             map.on('click', function (event) {       var destino = event.latlng;       
+                control.spliceWaypoints(control.getWaypoints().length - 1, 1, destino);     });
+        
+        })
+});
+
+
+
+marker4.on('mouseover', function (event) {
+    this.bindPopup("<b>Parc del Turó de la Peira</b><br>Obert les 24 hores<br>" +
+        "Província: Barcelona<br>Passeig de Fabra i Puig, 396 - 406 , s/n, 08031 Nou Barris, Barcelona" +
+        "<br><img src='./img/parcc_turo.webp' style='width: 80%' alt='Imagen 1'>" +
+        "<br><button id='rutaBtn'>Favorito</button>").openPopup();
+        document.getElementById('rutaBtn').addEventListener('click', function(event){
+            // Añadir la capa de enrutamiento       
+            var control = L.Routing.control({     
+                waypoints: [      
+                L.latLng(41.3498804, 2.1096487),        
+                // El destino se establecerá dinámicamente al hacer clic en el mapa     
+            ],     routeWhileDragging: true,     }).addTo(map);      
+            // Agregar evento al mapa para establecer el destino al hacer clic    
+             map.on('click', function (event) {       var destino = event.latlng;       
+                control.spliceWaypoints(control.getWaypoints().length - 1, 1, destino);     });
+        
+        })
+});
+
+
+marker5.on('mouseover', function (event) {
+    this.bindPopup("<b>Parc de la Creueta del Coll</b><br>Obert ⋅ Tanca a les 21:00<br>" +
+        "Província: Barcelona<br>Passeig de la Mare de Déu del Coll 77 , s/n, 08023 Gràcia, Barcelona" +
+        "<br><img src='./img/parc_creueta.webp' style='width: 80%' alt='Imagen 1'>" +
+        "<br><button id='rutaBtn'>Favorito</button>").openPopup();
+        document.getElementById('rutaBtn').addEventListener('click', function(event){
+            // Añadir la capa de enrutamiento       
+            var control = L.Routing.control({     
+                waypoints: [      
+                L.latLng(41.3498804, 2.1096487),        
+                // El destino se establecerá dinámicamente al hacer clic en el mapa     
+            ],     routeWhileDragging: true,     }).addTo(map);      
+            // Agregar evento al mapa para establecer el destino al hacer clic    
+             map.on('click', function (event) {       var destino = event.latlng;       
+                control.spliceWaypoints(control.getWaypoints().length - 1, 1, destino);     });
+        
+        })
+});
+
+
+
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
 
     </script>
     <script>
