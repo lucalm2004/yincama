@@ -23,6 +23,12 @@
             width: 100%;
         }
 
+        .swal2-confirm {
+            background-color: #F9F7D0 !important;
+            color: black !important;
+
+        }
+
         .separator {
             margin: 1rem 0;
         }
@@ -118,35 +124,46 @@
 </div>
 
 
+<div id="grupoModal">
+</div>
+
+
 
 </div>
 
 <script>
+
     function grupo(id) {
+        
         var modal = document.getElementById('gimcamasModal');
         modal.style.display = 'none';
 
         var modale = document.getElementById('gruposModal');
-        modale.style.visibility = 'visible';
+        // modale.style.visibility = 'visible';
+        modale.style.display = 'block';
+
         $.ajax({
             url: '/grupos?id=' + id,
             method: 'GET',
             success: function(response) {
                 var html =
                     '<input type="button" id="volver" onclick="cerrar()" value="Gimcamas" class="btn btn-primary"><h3>Selecciona el grupo:</h3><div class="row">';
-                        if (response.length === 0) {
-                        html += '<div class="submit"><button onclick="refreshGrupo()">Crear Grupo</button></div>'
-            }else{
-                $.each(response, function(index, grupo) {
-                html += '<input type="button" value="' + grupo.nombre_gru + '"></br>';
-            
-                });
-            }
-                     
+                if (response.length === 0) {
+                    html +=
+                        '<div class="submit"><button onclick="crearGrupo('+id+')">Crear Grupo</button></div>'
+                } else {
+                    $.each(response, function(index, grupo) {
+                        html += '<input onclick="unirse('+grupo.id_gru+','+id+')" type="button" value="' + grupo.nombre_gru + '"></br>';
+                       
+                    });
+                }
+
                 html += '</div>';
-                html += '<div class="submit"><button onclick="refreshGrupo('+id+')">¿No encuentras a tu grupo?</button></div>'
+                html += '<div class="submit"><button onclick="refreshGrupo(' + id +
+                    ')">¿No encuentras a tu grupo?</button></div>'
                 if (response.length > 0) {
-                html += '<div class="submit"><button onclick="crearGrupo()">¿Quieres crear un grupo?</button></div>'
+                    html +=
+                        '<div class="submit"><button onclick="crearGrupo('+id+')">¿Quieres crear un grupo?</button></div>'
                 }
                 $('#gruposModal').html(html);
             },
@@ -156,26 +173,31 @@
         });
     }
 
-    function refreshGrupo(id){
+    function refreshGrupo(id) {
+        console.log(id)
+        var ide = id;
         $.ajax({
             url: '/grupos?id=' + id,
             method: 'GET',
             success: function(response) {
                 var html =
                     '<input type="button" id="volver" onclick="cerrar()" value="Gimcamas" class="btn btn-primary"><h3>Selecciona el grupo:</h3><div class="row">';
-                        if (response.length === 0) {
-                        html += '<div class="submit"><button onclick="refreshGrupo()">Crear Grupo</button></div>'
-            }else{
-                $.each(response, function(index, grupo) {
-                html += '<input type="button" value="' + grupo.nombre_gru + '"></br>';
-            
-                });
-            }
-                     
+                if (response.length === 0) {
+                    
+                    html += '<div class="submit"><button onclick="crearGrupo(' + ide +')">Crear Grupo</button></div>'
+                } else {
+                    $.each(response, function(index, grupo) {
+                        html += '<input type="button" onclick="unirse('+grupo.id_gru+')" value="' + grupo.nombre_gru + '"></br>';
+                       
+                    });
+                }
+
                 html += '</div>';
-                html += '<div class="submit"><button onclick="refreshGrupo('+id+')">¿No encuentras a tu grupo?</button></div>'
+                html += '<div class="submit"><button onclick="refreshGrupo(' + ide +
+                    ')">¿No encuentras a tu grupo?</button></div>'
                 if (response.length > 0) {
-                html += '<div class="submit"><button onclick="crearGrupo()">¿Quieres crear un grupo?</button></div>'
+                    html += '<div class="submit"><button onclick="crearGrupo(' + ide +
+                        ')">¿Quieres crear un grupo?</button></div>'
                 }
 
                 $('#gruposModal').html(html);
@@ -187,12 +209,102 @@
             }
         });
     }
+function unirse(id, idgru){
+        var modale = document.getElementById('gruposModal');
+        // modale.style.visibility = 'hidden';
+        modale.style.display = 'none';
+
+        var modal = document.getElementById('grupoModal');
+        modal.style.display = 'block';
+
+        $.ajax({
+    url: '/unirseGrupo?id=' + id,
+    method: 'GET',
+    success: function(response) {
+        refreshGrupo(id);
+        var html =
+            '<input type="button" id="volver" onclick="cerrarG('+idgru+')" value="Grupos" class="btn btn-primary"><h3>Selecciona el grupo:</h3><div class="row">';
+        
+        var count = response.length; 
+
+        html += '<p>Total: ' + count + '/4 personas.</p>'; 
+
+        $.each(response, function(index, grupo) {
+            html += '<input type="button"  value="' + grupo.nombre_user + '"></br>';
+        });
+
+        html += '</div>';
+        html += '<div class="submit"><button onclick="unirseGrupo(' + id + ')">Unirse al grupo.</button></div>';
+        
+        $('#grupoModal').html(html);
+
+    },
+    error: function(xhr, status, error) {
+        console.error(error);
+    }
+});
+
+}
+
+function cerrarG(id) {
+        var modal = document.getElementById('gruposModal');
+        // modal.style.visibility = 'visible';
+        modal.style.display = 'block';
+
+        
+        var modale = document.getElementById('grupoModal');
+        // modale.style.visibility = 'hidden';
+        modale.style.display = 'none';
+        grupo(id)
+
+
+    }
+
+    function crearGrupo(id) {
+        // Mostrar SweetAlert con un input para el nombre del grupo
+        Swal.fire({
+            title: 'Crear un grupo',
+            input: 'text',
+            inputPlaceholder: 'Ingrese el nombre del grupo',
+            showCancelButton: true,
+            confirmButtonText: 'Confirmar',
+            cancelButtonText: 'Cancelar',
+            allowOutsideClick: false,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debes ingresar un nombre para el grupo';
+                }
+            }
+        }).then((result) => {
+            // Si el usuario hace clic en "Confirmar" y proporciona un valor
+            if (result.isConfirmed) {
+                // Obtener el valor del input
+                const nombreGrupo = result.value;
+                $.ajax({
+                    url: '/creargrupo?id=' + id + '&nombre=' + nombreGrupo,
+                    method: 'GET',
+                    success: function(response) {
+                        refreshGrupo(id);
+
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+
+
+            }
+        });
+    }
+
 
     function cerrar() {
         var modal = document.getElementById('gimcamasModal');
         modal.style.display = 'grid';
         var modale = document.getElementById('gruposModal');
-        modale.style.visibility = 'hidden';
+        // modale.style.visibility = 'hidden';
+                modale.style.display = 'none';
+
     }
 
 
@@ -218,3 +330,5 @@
         });
     }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
