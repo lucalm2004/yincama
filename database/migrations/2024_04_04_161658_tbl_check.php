@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_user_fk');
             $table->primary('id_check');
             $table->foreign('id_gim-lug_fk')->references('id_gim-lug')->on('tbl_gimcana-lugares')->onDelete('cascade');
-            $table->foreign('id_user_fk')->references('id_user')->on('tbl_user')->onDelete('cascade');
+            $table->foreign('id_user_fk')->references('id_user')->on('tbl_usuario')->onDelete('cascade');
         });
         
     }

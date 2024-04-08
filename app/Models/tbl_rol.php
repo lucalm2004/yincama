@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class tbl_grupos extends Model
+class tbl_rol extends Model
 {
     use HasFactory;
-    protected $table = 'tbl_grupos';
+    protected $table = 'tbl_roles';
 }
