@@ -12,7 +12,7 @@ class GrupoController extends Controller
         // Captura el ID enviado en la solicitud AJAX
         $id = $request->input('id');
 
-        $grupos = DB::table('tbl_grupos')->where('id_gru', $id)->get();
+        $grupos = DB::table('tbl_grupos')->where('ind_gim', $id)->get();
 
         
         return response()->json($grupos);
