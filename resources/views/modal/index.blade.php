@@ -100,7 +100,7 @@
 </div>
 </div>
 
-<div id="gruposModal">asd
+<div id="gruposModal">
 </div>
 
 
