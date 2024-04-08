@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,6 +42,10 @@
             background-color: #F9F7D0;
             height: 50%;
             border-radius: 1rem;
+            padding-top: 3%;
+            padding-bottom: 3%;
+            padding-left: 3%;
+
         }
 
         .row button {
@@ -50,51 +55,94 @@
             background-color: #F9F7D0;
             height: 50%;
             border-radius: 1rem;
+
         }
 
         .submit button {
             border: none;
-            width: 50%;
-            margin: 0.75rem 25%;
+            width: 70%;
+            margin: 0.75rem 15%;
             background-color: #F9F7D0;
             height: 50%;
             border-radius: 1rem;
+            padding-top: 3%;
+            padding-bottom: 3%;
+            padding-left: 3%;
+        }
+
+        #yinkamas {
+            max-height: 100%;
+            overflow-y: scroll;
+            margin-bottom: 0px;
         }
     </style>
 </head>
+
 <body>
-    
+
 </body>
+
 </html>
 
-<div>
-    <h3>Tus marcadores:</h3>
-    <select>
-        <option></option>
-        <option>Marcador1</option>
-        <option>Marcador2</option>
-        <option>Marcador3</option>
-    </select>
-</div>
-<hr class="separator">
-<div>
-    <div class="row">
-        <h3>Nombre: </h3>
-        <input type="text">
-    </div>
-    <div class="row">
-        <h3>Descripción: </h3>
-        <input type="text">
-    </div>
-    <div class="row">
-        <h3>Categoria: </h3>
-        <input type="text">
-    </div>
-    <div class="row">
-        <h3>Ubicacion: </h3>
-        <button>Ver en mapa</button>
-    </div>
+<div id="gimcamasModal">
+    <h3>Selecciona la Gincama:</h3>
+
+    @foreach ($modal as $registro)
+        <div>
+            <div class="row">
+                <input onclick="grupo({{ $registro->id_gim }})" id="{{ $registro->id_gim }}" type="button"
+                    value="{{ $registro->nombre_gim }}" style="font-size: 16px; ">
+            </div>
+        </div>
+    @endforeach
     <div class="submit">
-        <button>Actualizar / Crear</button>
-    </div>
+        <button id="refreshGimcamas" onclick="refreshData()">¿No encuentras la Gincama?</button>
 </div>
+</div>
+
+<div id="gruposModal">
+</div>
+
+
+
+</div>
+
+<script>
+    function grupo(id) {
+    var modal = document.getElementById('gimcamasModal');
+    modal.style.display = 'none';
+
+    $.ajax({
+        url: '/grupos?id=' + id,
+        method: 'GET',
+        success: function(response) {
+            var html = '<h3>Selecciona el grupo:</h3><div class="row">';
+            $.each(response, function(index, grupo) {
+                html += '<input type="button" value="' + grupo.nombre_gru + '">';
+            });
+            html += '</div>';
+            $('#gruposModal').html(html);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+
+
+
+    
+
+    function refreshData() {
+        $.ajax({
+            url: '/modal',
+            method: 'GET',
+            success: function(response) {
+                $('#gruposModal').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    }
+</script>

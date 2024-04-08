@@ -7,10 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
    <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
         body,
         html {
+            font-family: "Inter", sans-serif;
+
             margin: 0;
             padding: 0;
             height: 100%;
@@ -46,7 +51,7 @@
 
         .popup-container {
             position: absolute;
-            z-index: 999;
+            /* z-index: 999; */
             width: 100%;
             height: 88%;
             top: 12%;

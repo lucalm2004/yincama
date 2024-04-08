@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\modalGincamasController;
+use App\Http\Controllers\GrupoController;
 
 
 Route::get('/', function () {
@@ -10,3 +11,4 @@ Route::get('/', function () {
 
 
 Route::get('/modal', [modalGincamasController::class, 'index'])->name('modal.index');
+Route::get('/grupos', [GrupoController::class, 'obtenerGrupo']);
