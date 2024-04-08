@@ -38,11 +38,11 @@ html {
     position: absolute;
     z-index: 999;
     width: 100%;
-    height: 88%;
+    /* height: %; */
     top: 12%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* align-items: center; */
 }
 
 .popup-content {
@@ -62,7 +62,6 @@ html {
     /* Hacer visible */
 }
 
-
 .popup-content::after {
     width: 0;
     content: "";
@@ -79,24 +78,21 @@ html {
 }
 
 .popup-content.shifted::after {
-    left: calc(36.5% - 15px);
+    left: calc(50% - 15px);
     opacity: 1;
     /* Inicialmente oculto */
-
 }
 
 .popup-content.shifted1::after {
-    left: calc(10% - 15px);
+    left: calc(25% - 15px);
     opacity: 1;
     /* Inicialmente oculto */
-
 }
 
 .popup-content.shifted2::after {
-    left: calc(63.5% - 15px);
+    left: calc(75% - 15px);
     opacity: 1;
     /* Inicialmente oculto */
-
 }
 
 
@@ -104,7 +100,6 @@ html {
     left: calc(91% - 15px);
     opacity: 1;
     /* Inicialmente oculto */
-
 }
 
 
