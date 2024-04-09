@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\modalGincamasController;
 use App\Http\Controllers\GrupoController;
+use App\Http\Controllers\iniciarYim;
 use App\Http\Controllers\LoginController;
 
 Route::get('/', function () {
@@ -10,6 +11,8 @@ Route::get('/', function () {
 });
 
 Route::post('/logear', [LoginController::class, 'iniciarSesion'])->name('logear');
+
+Route::post('/iniciarYim', [iniciarYim::class, 'iniciarYim'])->name('iniciarYim');
 
 Route::get('/cliente', function () {
     return view('cliente');

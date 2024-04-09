@@ -257,7 +257,8 @@
                         ', ' + idgru + ')">¡Iniciar Gimcama!</button></div>';
                     
                 } else {
-                    html += '<div class="submit"><button onclick="iniciarGimcamaSin()">¡Iniciar Gimcama!</button></div>';
+                    html += '<div class="submit"><button onclick="iniciarGimcamaSin(' + id +
+                        ', ' + idgru + ')">¡Iniciar Gimcama!</button></div>';
                     
                     html += '<div class="submit"><button onclick="unirseGrupo(' + id +
                         ', ' + idgru + ')">Unirse al grupo.</button></div>';
@@ -274,7 +275,7 @@
         });
     }
 
-    function iniciarGimcamaSin(){
+    function iniciarGimcamaSin(id,gru){
         Swal.fire({
             title: '¿Estas seguro que quieres iniciar la gimcama sin todos los miembros?',
             showCancelButton: true,
@@ -282,13 +283,37 @@
             cancelButtonText: 'Cancelar',
             allowOutsideClick: false,
         }).then((result) => {
-            iniciarGimcama();
+            iniciarGimcama(id,gru);
         });
     }
 
 
-function iniciarGimcama(){
+function iniciarGimcama(id,gru){
+    var id;
+    var gru;
+    console.log(id,gru);
+    var csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
+    var formData = new FormData();
 
+    formData.append('id', id);
+    formData.append('gru', gru);
+    formData.append('_token', csrfToken);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/iniciarYim');
+    xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+    console.log('ejecutando');
+    xhr.send(formData);
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+            console.log('Solicitud completada con éxito', xhr.responseText);
+        } else {
+            console.error('Error en la solicitud:', xhr.responseText);
+        }
+    };  
+    xhr.onerror = function() {
+        console.error('Error en la solicitud AJAX:', xhr.statusText);
+    };    
 }
 
 
