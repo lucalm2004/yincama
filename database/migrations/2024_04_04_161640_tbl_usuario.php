@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('nombre_user')->nullable();
             $table->string('correo_user')->nullable();
             $table->string('pwd_user')->nullable();
+            $table->string('latitud_user')->nullable();
+            $table->string('longitud_user')->nullable();
             $table->unsignedBigInteger('id_rol_fk');
             $table->foreign('id_rol_fk')->references('id_rol')->on('tbl_roles')->onDelete('cascade');
         });

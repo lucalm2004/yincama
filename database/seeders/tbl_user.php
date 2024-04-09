@@ -34,6 +34,7 @@ class tbl_user extends Seeder
                 'correo_user' => 'mane@gmail.com',
                 'pwd_user' => bcrypt('asdASD123'),
                 'id_rol_fk' => 2,
+                
             ],
             [
                 'nombre_user' => 'Alberto',
