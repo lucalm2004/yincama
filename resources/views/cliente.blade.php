@@ -9,8 +9,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-   <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
         body,
         html {
@@ -61,19 +61,21 @@
         }
 
         .popup-content {
-    background-color: #293A68;
-    height: 80vh;
-    width: 90vw;
-    position: relative;
-    border-radius: 1rem;
-    margin: 19px;
-    opacity: 0; Inicialmente oculto
-    transition: opacity 0.5s ease; /* Transición de opacidad */
-}
+            background-color: #293A68;
+            height: 80vh;
+            width: 90vw;
+            position: relative;
+            border-radius: 1rem;
+            margin: 19px;
+            opacity: 0;
+            Inicialmente oculto transition: opacity 0.5s ease;
+            /* Transición de opacidad */
+        }
 
-.popup-content.visible {
-    opacity: 1; /* Hacer visible */
-}
+        .popup-content.visible {
+            opacity: 1;
+            /* Hacer visible */
+        }
 
 
         .popup-content::after {
@@ -86,33 +88,39 @@
             top: -14px;
             /* Cambiar el % para definir la posicion horizontal */
             left: calc(10% - 15px);
-            opacity: 0; /* Inicialmente oculto */
-    transition: opacity 0.5s ease;
+            opacity: 0;
+            /* Inicialmente oculto */
+            transition: opacity 0.5s ease;
         }
+
         .popup-content.shifted::after {
-    left: calc(36.5% - 15px);
-    opacity: 1; /* Inicialmente oculto */
+            left: calc(36.5% - 15px);
+            opacity: 1;
+            /* Inicialmente oculto */
 
-}
+        }
 
-.popup-content.shifted1::after {
-    left: calc(10% - 15px);
-    opacity: 1; /* Inicialmente oculto */
+        .popup-content.shifted1::after {
+            left: calc(10% - 15px);
+            opacity: 1;
+            /* Inicialmente oculto */
 
-}
+        }
 
-.popup-content.shifted2::after {
-    left: calc(63.5% - 15px);
-    opacity: 1; /* Inicialmente oculto */
+        .popup-content.shifted2::after {
+            left: calc(63.5% - 15px);
+            opacity: 1;
+            /* Inicialmente oculto */
 
-}
+        }
 
 
-.popup-content.shifted3::after {
-    left: calc(91% - 15px);
-    opacity: 1; /* Inicialmente oculto */
+        .popup-content.shifted3::after {
+            left: calc(91% - 15px);
+            opacity: 1;
+            /* Inicialmente oculto */
 
-}
+        }
     </style>
 </head>
 
@@ -123,7 +131,7 @@
                 <script>
                     $(document).ready(function() {
                         $.ajax({
-                            url: '{{ route("modal.index") }}',
+                            url: '{{ route('modal.index') }}',
                             method: 'GET',
                             success: function(response) {
                                 $('#yinkamas').html(response);
@@ -133,10 +141,29 @@
                             }
                         });
                     });
-                  </script>
+                </script>
             </div>
-                   </div>
+
+            <div id="perfil" style="display: none;">
+                <script>
+                    $(document).ready(function() {
+                        $.ajax({
+                            url: '{{ route('perfil.index') }}',
+                            method: 'GET',
+                            success: function(response) {
+                                $('#perfil').html(response);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Hubo un error al obtener las incidencias:', error);
+                            }
+                        });
+                    });
+                </script>
+            </div>
+        </div>
     </div>
+
+   
 
     <div id="map"></div>
 
@@ -149,86 +176,89 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-     var popupContent = document.querySelector('.popup-content');
-     var container = document.querySelector('.popup-container');
+        var popupContent = document.querySelector('.popup-content');
+        var container = document.querySelector('.popup-container');
 
-function removeClasses() {
-    popupContent.classList.remove('shifted');
-    popupContent.classList.remove('shifted1');
-    popupContent.classList.remove('shifted2');
-    popupContent.classList.remove('shifted3');
-}
+        function removeClasses() {
+            popupContent.classList.remove('shifted');
+            popupContent.classList.remove('shifted1');
+            popupContent.classList.remove('shifted2');
+            popupContent.classList.remove('shifted3');
+        }
 
-var button1 = document.getElementById('button1');
-button1.onclick = function() {
-    document.getElementById('yinkamas').style.display = 'grid';
+        var button1 = document.getElementById('button1');
+        button1.onclick = function() {
+            document.getElementById('yinkamas').style.display = 'grid';
+            document.getElementById('perfil').style.display = 'none';
 
-    if (popupContent.classList.contains('shifted1')) {
-        removeClasses();
-        container.style = 'z-index: 0;'
-        popupContent.classList.remove('visible'); // Ocultar suavemente
-    } else {
-        removeClasses();
-        container.style = 'z-index: 999;'
+            if (popupContent.classList.contains('shifted1')) {
+                removeClasses();
+                container.style = 'z-index: 0;'
+                popupContent.classList.remove('visible'); // Ocultar suavemente
+            } else {
+                removeClasses();
+                container.style = 'z-index: 999;'
 
-        popupContent.classList.add('visible'); // Mostrar suavemente
-        popupContent.classList.toggle('shifted1');
-    }
-};
+                popupContent.classList.add('visible'); // Mostrar suavemente
+                popupContent.classList.toggle('shifted1');
+            }
+        };
 
-var button2 = document.getElementById('button2');
-button2.onclick = function() {
-    document.getElementById('yinkamas').style.display = 'none';
+        var button2 = document.getElementById('button2');
+        button2.onclick = function() {
+            document.getElementById('perfil').style.display = 'grid';
 
-    if (popupContent.classList.contains('shifted')) {
-        removeClasses();
-        container.style = 'z-index: 0;'
+            document.getElementById('yinkamas').style.display = 'none';
 
-        popupContent.classList.remove('visible'); // Ocultar suavemente
-    } else {
-        removeClasses();
-        container.style = 'z-index: 999;'
+            if (popupContent.classList.contains('shifted')) {
+                removeClasses();
+                container.style = 'z-index: 0;'
 
-        popupContent.classList.add('visible'); // Mostrar suavemente
-        popupContent.classList.toggle('shifted');
-    }
-};
+                popupContent.classList.remove('visible'); // Ocultar suavemente
+            } else {
+                removeClasses();
+                container.style = 'z-index: 999;'
 
-var button3 = document.getElementById('button3');
-button3.onclick = function() {
-    document.getElementById('yinkamas').style.display = 'none';
+                popupContent.classList.add('visible'); // Mostrar suavemente
+                popupContent.classList.toggle('shifted');
+            }
+        };
 
-    if (popupContent.classList.contains('shifted2')) {
-        removeClasses();
-        container.style = 'z-index: 0;'
+        var button3 = document.getElementById('button3');
+        button3.onclick = function() {
+            document.getElementById('yinkamas').style.display = 'none';
 
-        popupContent.classList.remove('visible'); // Ocultar suavemente
-    } else {
-        removeClasses();
-        container.style = 'z-index: 999;'
+            if (popupContent.classList.contains('shifted2')) {
+                removeClasses();
+                container.style = 'z-index: 0;'
 
-        popupContent.classList.add('visible'); // Mostrar suavemente
-        popupContent.classList.toggle('shifted2');
-    }
-};
+                popupContent.classList.remove('visible'); // Ocultar suavemente
+            } else {
+                removeClasses();
+                container.style = 'z-index: 999;'
 
-var button4 = document.getElementById('button4');
-button4.onclick = function() {
-    document.getElementById('yinkamas').style.display = 'none';
+                popupContent.classList.add('visible'); // Mostrar suavemente
+                popupContent.classList.toggle('shifted2');
+            }
+        };
 
-    if (popupContent.classList.contains('shifted3')) {
-        removeClasses();
-        container.style = 'z-index: 0;'
+        var button4 = document.getElementById('button4');
+        button4.onclick = function() {
+            document.getElementById('yinkamas').style.display = 'none';
 
-        popupContent.classList.remove('visible'); // Ocultar suavemente
-    } else {
-        removeClasses();
-        container.style = 'z-index: 999;'
+            if (popupContent.classList.contains('shifted3')) {
+                removeClasses();
+                container.style = 'z-index: 0;'
 
-        popupContent.classList.add('visible'); // Mostrar suavemente
-        popupContent.classList.toggle('shifted3');
-    }
-};
+                popupContent.classList.remove('visible'); // Ocultar suavemente
+            } else {
+                removeClasses();
+                container.style = 'z-index: 999;'
+
+                popupContent.classList.add('visible'); // Mostrar suavemente
+                popupContent.classList.toggle('shifted3');
+            }
+        };
 
 
 
@@ -244,11 +274,8 @@ button4.onclick = function() {
         L.control.zoom({
             position: 'bottomright'
         }).addTo(map);
-
     </script>
-    <script>
-
-    </script>
+    <script></script>
 </body>
 
 </html>
