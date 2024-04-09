@@ -49,4 +49,47 @@ class GrupoController extends Controller
 
         
     }
+
+    // public function agregaGrupo(Request $request)
+    // {
+    //     $id = $request->input('id');
+    //     // Cuando recupera la variable de sesion se setea aqui
+    //     // $idUser = $request->input('idUser');
+    //     DB::table('tbl_grupos_user')->insert([
+    //         'id_grupo' => $id,
+    //         'id_user' => 1
+    //     ]);
+
+    //     // DB::table('tbl_grupos_user')->insert([
+    //     //     'id_grupo' => $id,
+    //     //     'id_user' => $idUser
+    //     // ]);
+        
+    // }
+    public function agregaGrupo(Request $request)
+{
+    $id_grupo = $request->input('id');
+
+    // Verificar si el usuario ya está dentro del grupo
+    $usuario_en_grupo = DB::table('tbl_grupos_user')
+                        ->where('id_grupo', $id_grupo)
+                        ->where('id_user', 1) // Aquí debes cambiar 1 por la ID del usuario actual
+                        ->exists();
+
+    if ($usuario_en_grupo) {
+        // El usuario ya está en el grupo, no es necesario agregarlo nuevamente
+        return response()->json(['message' => 'El usuario ya está en el grupo'], 400);
+    } else {
+        // El usuario no está en el grupo, se puede agregar
+        DB::table('tbl_grupos_user')->insert([
+            'id_grupo' => $id_grupo,
+            'id_user' => 1 // Aquí debes cambiar 1 por la ID del usuario actual
+        ]);
+
+        return response()->json(['message' => 'Usuario agregado al grupo'], 200);
+    }
+}
+
+
+    
 }

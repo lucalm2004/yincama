@@ -162,6 +162,10 @@ function removeClasses() {
 var button1 = document.getElementById('button1');
 button1.onclick = function() {
     document.getElementById('yinkamas').style.display = 'grid';
+    button1.style.backgroundColor = "#131b32";
+    button2.style.backgroundColor = "#293A68";
+    button3.style.backgroundColor = "#293A68";
+    button4.style.backgroundColor = "#293A68";
 
     if (popupContent.classList.contains('shifted1')) {
         removeClasses();
@@ -179,7 +183,10 @@ button1.onclick = function() {
 var button2 = document.getElementById('button2');
 button2.onclick = function() {
     document.getElementById('yinkamas').style.display = 'none';
-
+    button2.style.backgroundColor = "#131b32";
+    button1.style.backgroundColor = "#293A68";
+    button3.style.backgroundColor = "#293A68";
+    button4.style.backgroundColor = "#293A68";
     if (popupContent.classList.contains('shifted')) {
         removeClasses();
         container.style = 'z-index: 0;'
@@ -197,7 +204,10 @@ button2.onclick = function() {
 var button3 = document.getElementById('button3');
 button3.onclick = function() {
     document.getElementById('yinkamas').style.display = 'none';
-
+    button3.style.backgroundColor = "#131b32";
+    button2.style.backgroundColor = "#293A68";
+    button1.style.backgroundColor = "#293A68";
+    button4.style.backgroundColor = "#293A68";
     if (popupContent.classList.contains('shifted2')) {
         removeClasses();
         container.style = 'z-index: 0;'
@@ -215,7 +225,10 @@ button3.onclick = function() {
 var button4 = document.getElementById('button4');
 button4.onclick = function() {
     document.getElementById('yinkamas').style.display = 'none';
-
+    button4.style.backgroundColor = "#131b32";
+    button2.style.backgroundColor = "#293A68";
+    button3.style.backgroundColor = "#293A68";
+    button1.style.backgroundColor = "#293A68";
     if (popupContent.classList.contains('shifted3')) {
         removeClasses();
         container.style = 'z-index: 0;'

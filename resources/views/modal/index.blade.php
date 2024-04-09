@@ -132,9 +132,8 @@
 </div>
 
 <script>
-
     function grupo(id) {
-        
+
         var modal = document.getElementById('gimcamasModal');
         modal.style.display = 'none';
 
@@ -150,11 +149,13 @@
                     '<input type="button" id="volver" onclick="cerrar()" value="Gimcamas" class="btn btn-primary"><h3>Selecciona el grupo:</h3><div class="row">';
                 if (response.length === 0) {
                     html +=
-                        '<div class="submit"><button onclick="crearGrupo('+id+')">Crear Grupo</button></div>'
+                        '<div class="submit"><button onclick="crearGrupo(' + id +
+                        ')">Crear Grupo</button></div>'
                 } else {
                     $.each(response, function(index, grupo) {
-                        html += '<input onclick="unirse('+grupo.id_gru+','+id+')" type="button" value="' + grupo.nombre_gru + '"></br>';
-                       
+                        html += '<input onclick="unirse(' + grupo.id_gru + ',' + id +
+                            ')" type="button" value="' + grupo.nombre_gru + '"></br>';
+
                     });
                 }
 
@@ -163,7 +164,8 @@
                     ')">¿No encuentras a tu grupo?</button></div>'
                 if (response.length > 0) {
                     html +=
-                        '<div class="submit"><button onclick="crearGrupo('+id+')">¿Quieres crear un grupo?</button></div>'
+                        '<div class="submit"><button onclick="crearGrupo(' + id +
+                        ')">¿Quieres crear un grupo?</button></div>'
                 }
                 $('#gruposModal').html(html);
             },
@@ -183,12 +185,14 @@
                 var html =
                     '<input type="button" id="volver" onclick="cerrar()" value="Gimcamas" class="btn btn-primary"><h3>Selecciona el grupo:</h3><div class="row">';
                 if (response.length === 0) {
-                    
-                    html += '<div class="submit"><button onclick="crearGrupo(' + ide +')">Crear Grupo</button></div>'
+
+                    html += '<div class="submit"><button onclick="crearGrupo(' + ide +
+                        ')">Crear Grupo</button></div>'
                 } else {
                     $.each(response, function(index, grupo) {
-                        html += '<input type="button" onclick="unirse('+grupo.id_gru+')" value="' + grupo.nombre_gru + '"></br>';
-                       
+                        html += '<input type="button" onclick="unirse(' + grupo.id_gru + ',' + id +
+                            ')" value="' + grupo.nombre_gru + '"></br>';
+
                     });
                 }
 
@@ -209,7 +213,8 @@
             }
         });
     }
-function unirse(id, idgru){
+
+    function unirse(id, idgru) {
         var modale = document.getElementById('gruposModal');
         // modale.style.visibility = 'hidden';
         modale.style.display = 'none';
@@ -218,40 +223,108 @@ function unirse(id, idgru){
         modal.style.display = 'block';
 
         $.ajax({
-    url: '/unirseGrupo?id=' + id,
-    method: 'GET',
-    success: function(response) {
-        refreshGrupo(id);
-        var html =
-            '<input type="button" id="volver" onclick="cerrarG('+idgru+')" value="Grupos" class="btn btn-primary"><h3>Selecciona el grupo:</h3><div class="row">';
-        
-        var count = response.length; 
+            url: '/unirseGrupo?id=' + id,
+            method: 'GET',
+            success: function(response) {
+                refreshGrupo(id);
+                var html =
+                    '<input type="button" id="volver" onclick="cerrarG(' + idgru +
+                    ')" value="Grupos" class="btn btn-primary"><h3>Grupo: </h3><div class="row">';
 
-        html += '<p>Total: ' + count + '/4 personas.</p>'; 
+                var count = response.length;
 
-        $.each(response, function(index, grupo) {
-            html += '<input type="button"  value="' + grupo.nombre_user + '"></br>';
+                html += '<p>Total: ' + count + '/4 personas.</p>';
+
+                $.each(response, function(index, grupo) {
+                    html += '<input type="button"  value="' + grupo.nombre_user + '"></br>';
+                });
+
+                html += '</div>';
+
+                if (response.length > 4) {
+                    html +=
+                        '<div  class="submit"><button style="background-color: #989898;!important" id="unirseBtn">Grupo lleno.</button></div>';
+                    $(document).on('click', '#unirseBtn', function() {
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Grupo lleno',
+                            text: 'El grupo está lleno. Por favor, cree uno nuevo.'
+                        });
+
+                    });
+                    html += '<div class="submit"><button onclick="iniciarGimcama(' + id +
+                        ', ' + idgru + ')">¡Iniciar Gimcama!</button></div>';
+                    
+                } else {
+                    html += '<div class="submit"><button onclick="iniciarGimcamaSin()">¡Iniciar Gimcama!</button></div>';
+                    
+                    html += '<div class="submit"><button onclick="unirseGrupo(' + id +
+                        ', ' + idgru + ')">Unirse al grupo.</button></div>';
+                }
+
+
+
+                $('#grupoModal').html(html);
+
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
         });
-
-        html += '</div>';
-        html += '<div class="submit"><button onclick="unirseGrupo(' + id + ')">Unirse al grupo.</button></div>';
-        
-        $('#grupoModal').html(html);
-
-    },
-    error: function(xhr, status, error) {
-        console.error(error);
     }
-});
+
+    function iniciarGimcamaSin(){
+        Swal.fire({
+            title: '¿Estas seguro que quieres iniciar la gimcama sin todos los miembros?',
+            showCancelButton: true,
+            confirmButtonText: 'Confirmar',
+            cancelButtonText: 'Cancelar',
+            allowOutsideClick: false,
+        }).then((result) => {
+            iniciarGimcama();
+        });
+    }
+
+
+function iniciarGimcama(){
 
 }
 
-function cerrarG(id) {
+
+    function unirseGrupo(id, idgru) {
+        // $session recuperar la variable del usuario para enviarlo
+        // $userid = $_SESSION['id_user'];
+        $.ajax({
+            url: '/agregaGrupo?id=' + id,
+            // url: '/agregaGrupo?id=' + id +'&idUser='+$userid,
+
+            method: 'GET',
+            success: function(response) {
+
+                unirse(id, idgru)
+
+            },
+            error: function(xhr, status, error) {
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ya estas en el grupo.'
+                });
+            }
+
+        });
+
+
+    }
+
+    function cerrarG(id) {
         var modal = document.getElementById('gruposModal');
         // modal.style.visibility = 'visible';
         modal.style.display = 'block';
 
-        
+
         var modale = document.getElementById('grupoModal');
         // modale.style.visibility = 'hidden';
         modale.style.display = 'none';
@@ -303,7 +376,7 @@ function cerrarG(id) {
         modal.style.display = 'grid';
         var modale = document.getElementById('gruposModal');
         // modale.style.visibility = 'hidden';
-                modale.style.display = 'none';
+        modale.style.display = 'none';
 
     }
 

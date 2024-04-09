@@ -14,3 +14,5 @@ Route::get('/modal', [modalGincamasController::class, 'index'])->name('modal.ind
 Route::get('/grupos', [GrupoController::class, 'obtenerGrupo']);
 Route::get('/creargrupo', [GrupoController::class, 'crearGrupo']);
 Route::get('/unirseGrupo', [GrupoController::class, 'unirseGrupo']);
+Route::get('/agregaGrupo', [GrupoController::class, 'agregaGrupo']);
+
