@@ -74,8 +74,8 @@ function buttonClick2() {
 
 }
 
-function buttonClick3() {
-    if (popupContent.classList.contains('shifted2')) {
+function buttonClick3(idCat) {
+    if (popupContent.classList.contains('shifted2') && !idCat) {
         removeClasses();
         container.style.zIndex = '0';
         popupContent.classList.remove('visible'); // Ocultar suavemente
@@ -84,13 +84,17 @@ function buttonClick3() {
         var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         formdata.append('_token', csrfToken);
 
+        if (idCat) {
+            formdata.append('idCat', idCat);
+        }
+
         var ajax = new XMLHttpRequest();
         ajax.open('POST', '/selectCategoria');
         ajax.onload = function () {
             if (ajax.status == 200) {
-                console.log(ajax.responseText);
+
                 var json = JSON.parse(ajax.responseText);
-                var html = "<div><div><h3>Categorias de marcador:</h3><select><option value=''></option>";
+                var html = "<div><div><h3>Categorias de marcador:</h3><select id='selectCategorias'><option value=''></option>";
                 json.forEach(function (item) {
                     html += "<option value='" + item.id_tipo + "'>" + item.tipo + "</option>";
                 });
@@ -103,7 +107,10 @@ function buttonClick3() {
                 popupContent.classList.add('visible'); // Mostrar suavemente
                 popupContent.classList.toggle('shifted2');
 
-                formCategoria();
+                newCategoria();
+                editCategoria();
+            } else {
+                console.log(ajax.responseText);
             }
         };
         ajax.send(formdata);
@@ -113,7 +120,14 @@ function buttonClick3() {
 
 /* Formularios */
 
-function formCategoria() {
+function editCategoria() {
+    document.getElementById('selectCategorias').addEventListener('change', function () {
+        buttonClick3()
+        buttonClick3(document.getElementById('selectCategorias').value)
+    })
+}
+
+function newCategoria() {
     document.getElementById('createCategory').addEventListener('submit', function (e) {
         e.preventDefault();
 

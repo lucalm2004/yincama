@@ -11,7 +11,14 @@ class adminController extends Controller
 {
     public function selectCategoria(Request $request)
     {
-        $categorias = tbl_tipo::all();
+        if (!$request->input('idCat')) {
+            $id = $request->input('idCat');
+
+            $categorias = tbl_tipo::find($id);
+        } else {
+            $categorias = tbl_tipo::all();
+        }
+
 
         return response()->json($categorias);
     }
@@ -20,7 +27,7 @@ class adminController extends Controller
     {
         $nombreCat = $request->input('nombreCat');
 
-        if (!$request->input('idC')) {
+        if (!$request->input('idCat')) {
 
             $categorias = new tbl_tipo();
             $categorias->tipo = $nombreCat;
@@ -29,7 +36,7 @@ class adminController extends Controller
 
             echo "ok";
         } else {
-            $id = $request->input('idC');
+            $id = $request->input('idCat');
 
             $categorias = tbl_tipo::find($id);
             $categorias->tipo = $nombreCat;
