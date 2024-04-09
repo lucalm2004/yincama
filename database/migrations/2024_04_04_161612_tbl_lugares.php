@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('nombre_lug')->nullable();
             $table->integer('tipo_lug')->nullable();
             $table->string('barrio_lug')->nullable();
-            $table->string('coordenadas_lug')->nullable();
+            $table->string('latitud_lug')->nullable();
+            $table->string('longitud_lug')->nullable();
             $table->string('desc_lug')->nullable();
             $table->primary('id_lug');
         });
