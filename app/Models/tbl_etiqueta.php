@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class tbl_gimcana_lugare extends Model
+class tbl_etiqueta extends Model
 {
     use HasFactory;
-    protected $table = 'tbl_gimcana_lugares';
+    protected $table = 'tbl_etiquetas';
 }
