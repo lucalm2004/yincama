@@ -23,13 +23,25 @@ class GrupoController extends Controller
         // Captura el ID enviado en la solicitud AJAX
         $id = $request->input('id');
         $nombre = $request->input('nombre');
-
+    
+        // Verificar si el nombre ya existe en la base de datos
+        $grupoExistente = DB::table('tbl_grupos')->where('nombre_gru', $nombre)->exists();
+    
+        // Si el grupo ya existe, retornar un mensaje de error
+        if ($grupoExistente) {
+            return response()->json(['error' => 'El grupo ya existe'], 400);
+        }
+    
+        // Si el grupo no existe, insertarlo en la base de datos
         DB::table('tbl_grupos')->insert([
             'nombre_gru' => $nombre,
             'ind_gim' => $id
         ]);
-        
+    
+        // Retornar una respuesta de éxito
+        return response()->json(['success' => 'Grupo creado exitosamente'], 200);
     }
+    
 
     public function unirseGrupo(Request $request)
     {

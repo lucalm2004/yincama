@@ -334,41 +334,45 @@ function iniciarGimcama(){
     }
 
     function crearGrupo(id) {
-        // Mostrar SweetAlert con un input para el nombre del grupo
-        Swal.fire({
-            title: 'Crear un grupo',
-            input: 'text',
-            inputPlaceholder: 'Ingrese el nombre del grupo',
-            showCancelButton: true,
-            confirmButtonText: 'Confirmar',
-            cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Debes ingresar un nombre para el grupo';
+    // Mostrar SweetAlert con un input para el nombre del grupo
+    Swal.fire({
+        title: 'Crear un grupo',
+        input: 'text',
+        inputPlaceholder: 'Ingrese el nombre del grupo',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        allowOutsideClick: false,
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Debes ingresar un nombre para el grupo';
+            }
+        }
+    }).then((result) => {
+        // Si el usuario hace clic en "Confirmar" y proporciona un valor
+        if (result.isConfirmed) {
+            // Obtener el valor del input
+            const nombreGrupo = result.value;
+            $.ajax({
+                url: '/creargrupo?id=' + id + '&nombre=' + nombreGrupo,
+                method: 'GET',
+                success: function(response) {
+                    refreshGrupo(id);
+                },
+                error: function(xhr, status, error) {
+                    // Mostrar SweetAlert con el mensaje de error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'El grupo ya existe'
+                    });
+                    console.error(error);
                 }
-            }
-        }).then((result) => {
-            // Si el usuario hace clic en "Confirmar" y proporciona un valor
-            if (result.isConfirmed) {
-                // Obtener el valor del input
-                const nombreGrupo = result.value;
-                $.ajax({
-                    url: '/creargrupo?id=' + id + '&nombre=' + nombreGrupo,
-                    method: 'GET',
-                    success: function(response) {
-                        refreshGrupo(id);
+            });
+        }
+    });
+}
 
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(error);
-                    }
-                });
-
-
-            }
-        });
-    }
 
 
     function cerrar() {
