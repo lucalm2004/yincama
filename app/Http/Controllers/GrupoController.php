@@ -24,9 +24,11 @@ class GrupoController extends Controller
         $id = $request->input('id');
         $nombre = $request->input('nombre');
     
-        // Verificar si el nombre ya existe en la base de datos
-        $grupoExistente = DB::table('tbl_grupos')->where('nombre_gru', $nombre)->exists();
-    
+        $grupoExistente = DB::table('tbl_grupos')
+        ->where('nombre_gru', $nombre)
+        ->where('ind_gim', $id)
+        ->exists();
+
         // Si el grupo ya existe, retornar un mensaje de error
         if ($grupoExistente) {
             return response()->json(['error' => 'El grupo ya existe'], 400);
