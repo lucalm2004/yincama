@@ -31,6 +31,7 @@ class LoginController extends Controller
                 // Las credenciales son correctas
                 // Almacenar información del usuario en la sesión
                 Session::put('usuario', $usuarioValido);
+                Session::put('id_user', $usuarioValido->id_user);
                 Session::put('rol', $usuarioValido->id_rol_fk); // Guardar el rol en la sesión
                 // Redirigir según el rol del usuario
                 // Agrega este código según tus necesidades

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class GrupoController extends Controller
 {
@@ -83,11 +84,11 @@ class GrupoController extends Controller
     public function agregaGrupo(Request $request)
 {
     $id_grupo = $request->input('id');
-
+    $id_user = Session::get('id_user');
     // Verificar si el usuario ya está dentro del grupo
     $usuario_en_grupo = DB::table('tbl_grupos_user')
                         ->where('id_grupo', $id_grupo)
-                        ->where('id_user', 1) // Aquí debes cambiar 1 por la ID del usuario actual
+                        ->where('id_user', $id_user) 
                         ->exists();
 
     if ($usuario_en_grupo) {
@@ -97,7 +98,7 @@ class GrupoController extends Controller
         // El usuario no está en el grupo, se puede agregar
         DB::table('tbl_grupos_user')->insert([
             'id_grupo' => $id_grupo,
-            'id_user' => 1 // Aquí debes cambiar 1 por la ID del usuario actual
+            'id_user' => $id_user
         ]);
 
         return response()->json(['message' => 'Usuario agregado al grupo'], 200);
