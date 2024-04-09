@@ -11,14 +11,7 @@ class adminController extends Controller
 {
     public function selectCategoria(Request $request)
     {
-        if (!$request->input('idCat')) {
-            $id = $request->input('idCat');
-
-            $categorias = tbl_tipo::find($id);
-        } else {
-            $categorias = tbl_tipo::all();
-        }
-
+        $categorias = tbl_tipo::all();
 
         return response()->json($categorias);
     }
@@ -29,30 +22,87 @@ class adminController extends Controller
 
         if (!$request->input('idCat')) {
 
-            $categorias = new tbl_tipo();
-            $categorias->tipo = $nombreCat;
+            $categoriaSearch = tbl_tipo::where('tipo', $nombreCat)->get();
 
-            $categorias->save();
+            if ($categoriaSearch->isEmpty()) {
+                $categorias = new tbl_tipo();
+                $categorias->tipo = $nombreCat;
 
-            echo "ok";
+                $categorias->save();
+
+                echo "ok";
+            } else {
+                echo "error";
+            }
         } else {
-            $id = $request->input('idCat');
+            $idCat = $request->input('idCat');
 
-            $categorias = tbl_tipo::find($id);
-            $categorias->tipo = $nombreCat;
+            $categoriaSearch = tbl_tipo::where('tipo', $nombreCat)->where('id_tipo', '!=', $idCat)->get();
 
-            $categorias->save();
+            if ($categoriaSearch->isEmpty()) {
+                $categorias = tbl_tipo::where('id_tipo', $idCat)->first();
+                $categorias->tipo = $nombreCat;
 
-            echo "modificado";
+                $categorias->save();
+
+                echo "modificado";
+            } else {
+                echo 'error';
+            }
         }
+    }
+
+    public function elimCategoria(Request $request)
+    {
+        $idCat = $request->input('idCat');
+
+        tbl_tipo::where('id_tipo', '=', $idCat)->delete();
     }
 
     public function selectMarcador(Request $request)
     {
-        $marcadores = tbl_Lugar::leftjoin('tbl_tipo-lugares', 'tbl_lugares.tipo_lug', '=', 'tbl_tipo-lugares.id_lug_fk')
-            ->leftjoin('tbl_tipo', 'tbl_tipo-lugares.id_tipo_fk', '=', 'tbl_tipo.id_tipo')
+        $marcadores = tbl_Lugar::leftJoin('tbl_tipo-lugares', 'tbl_lugares.id_lug', '=', 'tbl_tipo-lugares.id_lug_fk')
+            ->leftJoin('tbl_tipo', 'tbl_tipo-lugares.id_tipo_fk', '=', 'tbl_tipo.id_tipo')
+            ->groupBy('tbl_lugares.id_lug', 'tbl_lugares.nombre_lug', 'tbl_lugares.tipo_lug', 'tbl_lugares.barrio_lug', 'tbl_lugares.latitud_lug', 'tbl_lugares.longitud_lug', 'tbl_lugares.desc_lug')
+            ->select('tbl_lugares.*', tbl_tipo::raw('GROUP_CONCAT(tbl_tipo.tipo) AS tipos'))
             ->get();
 
         return response()->json($marcadores);
+    }
+
+    public function crearMarcador(Request $request)
+    {
+        $nombreMar = $request->input('nombreMar');
+
+        if (!$request->input('idMar')) {
+
+            $marcadorSearch = tbl_tipo::where('tipo', $nombreMar)->get();
+
+            if ($marcadorSearch->isEmpty()) {
+                $marcadores = new tbl_tipo();
+                $marcadores->tipo = $nombreMar;
+
+                $marcadores->save();
+
+                echo "ok";
+            } else {
+                echo "error";
+            }
+        } else {
+            $idMar = $request->input('idMar');
+
+            $marcadorSearch = tbl_tipo::where('tipo', $nombreMar)->where('id_tipo', '!=', $idMar)->get();
+
+            if ($marcadorSearch->isEmpty()) {
+                $marcadores = tbl_tipo::where('id_tipo', $idMar)->first();
+                $marcadores->tipo = $nombreMar;
+
+                $marcadores->save();
+
+                echo "modificado";
+            } else {
+                echo 'error';
+            }
+        }
     }
 }

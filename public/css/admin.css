@@ -210,3 +210,26 @@ html {
     display: none;
     z-index: 0;
 }
+
+.swal-wide {
+    width: 80px !important;
+    height: 80px !important;
+}
+
+.swal-icon--success svg {
+    width: 50px !important;
+    height: 50px !important;
+}
+
+input[type=checkbox] {
+    border: none;
+    width: 100%;
+    margin: 1rem 0 !important;
+    background-color: #F9F7D0;
+    height: 50%;
+    border-radius: 1rem;
+}
+
+.row label {
+    margin: 0.75rem 0 !important;
+}

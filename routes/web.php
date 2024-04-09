@@ -13,6 +13,7 @@ Route::get('/admintest', function () {
 
 Route::post('/selectCategoria', [adminController::class, 'selectCategoria'])->name('selectCategoria');
 Route::post('/crearCategoria', [adminController::class, 'crearCategoria'])->name('crearCategoria');
+Route::post('/elimCategoria', [adminController::class, 'elimCategoria'])->name('elimCategoria');
 
 
 Route::post('/selectMarcador', [adminController::class, 'selectMarcador'])->name('selectMarcador');

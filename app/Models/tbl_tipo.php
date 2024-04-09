@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class tbl_tipo extends Model
 {
     public $timestamps = false;
+    protected $primaryKey = 'id_tipo';
 
     use HasFactory;
     protected $table = 'tbl_tipo';
