@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\tbl_lugar;
 use App\Models\tbl_tipo;
 use App\Models\tbl_tipo_lugar;
+use App\Models\tbl_tipo_real;
 use Illuminate\Http\Request;
 
 class adminController extends Controller
@@ -63,8 +64,6 @@ class adminController extends Controller
     {
         $marcadores = tbl_Lugar::leftJoin('tbl_tipo-lugares', 'tbl_lugares.id_lug', '=', 'tbl_tipo-lugares.id_lug_fk')
             ->leftJoin('tbl_tipo', 'tbl_tipo-lugares.id_tipo_fk', '=', 'tbl_tipo.id_tipo')
-            ->groupBy('tbl_lugares.id_lug', 'tbl_lugares.nombre_lug', 'tbl_lugares.tipo_lug', 'tbl_lugares.barrio_lug', 'tbl_lugares.latitud_lug', 'tbl_lugares.longitud_lug', 'tbl_lugares.desc_lug')
-            ->select('tbl_lugares.*', tbl_tipo::raw('GROUP_CONCAT(tbl_tipo.tipo) AS tipos'))
             ->get();
 
         return response()->json($marcadores);
@@ -73,36 +72,44 @@ class adminController extends Controller
     public function crearMarcador(Request $request)
     {
         $nombreMar = $request->input('nombreMar');
+        $descripcionMar = $request->input('descripcionCat');
+        $catMar = $request->input('catMar');
 
         if (!$request->input('idMar')) {
 
-            $marcadorSearch = tbl_tipo::where('tipo', $nombreMar)->get();
+            $marcadores = new tbl_lugar();
+            $marcadores->nombre_lug = $nombreMar;
+            $marcadores->desc_lug = $descripcionMar;
 
-            if ($marcadorSearch->isEmpty()) {
-                $marcadores = new tbl_tipo();
-                $marcadores->tipo = $nombreMar;
+            $marcadores->save();
 
-                $marcadores->save();
 
-                echo "ok";
-            } else {
-                echo "error";
-            }
+            $lastInsertedId = $marcadores->id;
+
+            $marcador_lugar = new tbl_tipo_lugar();
+            $marcador_lugar->id_tipo_fk = $catMar;
+            $marcador_lugar->id_lug_fk = $lastInsertedId;
+
+            $marcador_lugar->save();
+
+            echo 'ok';
         } else {
             $idMar = $request->input('idMar');
 
-            $marcadorSearch = tbl_tipo::where('tipo', $nombreMar)->where('id_tipo', '!=', $idMar)->get();
+            $marcadores = tbl_lugar::where('id_lug', $idMar)->first();
+            $marcadores->nombre_lug = $nombreMar;
+            $marcadores->desc_lug = $descripcionMar;
 
-            if ($marcadorSearch->isEmpty()) {
-                $marcadores = tbl_tipo::where('id_tipo', $idMar)->first();
-                $marcadores->tipo = $nombreMar;
+            $marcadores->save();
 
-                $marcadores->save();
 
-                echo "modificado";
-            } else {
-                echo 'error';
-            }
+            $marcador_lugar = tbl_tipo_lugar::where('id_lug_fk', $idMar)->first();
+            $marcador_lugar->id_tipo_fk = $catMar;
+            $marcador_lugar->id_lug_fk = $idMar;
+
+            $marcador_lugar->save();
+
+            echo "modificado";
         }
     }
 }

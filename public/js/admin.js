@@ -38,8 +38,8 @@ button3.onclick = function () {
     buttonClick3();
 };
 
-function buttonClick2() {
-    if (popupContent.classList.contains('shifted')) {
+function buttonClick2(idMar) {
+    if (popupContent.classList.contains('shifted') && !idMar) {
         removeClasses();
         container.style.zIndex = '0';
         popupContent.classList.remove('visible'); // Ocultar suavemente
@@ -52,47 +52,87 @@ function buttonClick2() {
         ajax.open('POST', '/selectMarcador');
         ajax.onload = function () {
             if (ajax.status == 200) {
-                console.log(ajax.responseText)
-
                 var json = JSON.parse(ajax.responseText);
-                var html = "<div><h3>Tus marcadores:</h3><select><option></option>";
-                var categorias = '';
+                var html = "<div><h3>Tus marcadores:</h3><select id='selectMarcadores'><option></option>";
+                var idCorrect = "";
+                var nameCorrect = "";
+                var descCorrect = "";
+                var catCorrect = "";
+                var ubiCorrect = "";
+
                 json.forEach(function (item) {
-                    html += "<option value='" + item.id_lug + "'>" + item.nombre_lug + "</option>";
-                    categorias += item.tipos;
+                    if (idMar && item.id_lug == idMar && idMar != undefined) {
+                        html += "<option value='" + item.id_lug + "' selected>" + item.nombre_lug + "</option>";
+                        idCorrect = item.id_lug
+                        nameCorrect = item.nombre_lug
+                        descCorrect = item.desc_lug
+                        catCorrect = item.id_tipo
+                        ubiCorrect = item.latitud_lug + ',' + item.longitud_lug
+
+                    } else {
+                        html += "<option value='" + item.id_lug + "'>" + item.nombre_lug + "</option>";
+                    }
                 });
-                html += "</select></div><hr class='separator'><div><div class='row'><h3>Nombre: </h3><input type='text'></div><div class='row'><h3>Descripción: </h3><input type='text'></div><div class='row'>";
-                html += "<h3>Categoría:</h3>";
 
-                categorias.split(",").forEach(function (item) {
-                    html += "<input type='checkbox'><label>" + item + "</label>"
-                })
+                console.log(idMar + ' ' + idCorrect)
 
-                html += "</div><div class='row'><h3>Ubicación: </h3><button>Ver en mapa</button></div><div class='submit'><button>Crear</button><button>Eliminar</button></div></div>";
-                popupContent.innerHTML = html;
+                if (idMar == idCorrect && idMar != '') {
+                    html += "</select></div><hr class='separator'><form id='updateMarcador'><span id='ErrorMarcador'></span><div><div class='row'><h3>Nombre: </h3><input id='nameMarcador' type='text' value='" + nameCorrect + "'></div><div class='row'><h3>Descripción: </h3><input id='descMarcador' type='text' value='" + descCorrect + "'></div><div class='row'>";
+                } else {
+                    html += "</select></div><hr class='separator'><form id='createMarcador'><span id='ErrorMarcador'></span><div><div class='row'><h3>Nombre: </h3><input id='nameMarcador' type='text'></div><div class='row'><h3>Descripción: </h3><input id='descMarcador' type='text'></div><div class='row'>";
+                }
 
-                removeClasses();
 
-                container.style.zIndex = '999';
-                popupContent.classList.add('visible');
-                popupContent.classList.toggle('shifted');
+                html += "<h3>Categoría:</h3><select id='catMarcador'><option></option>";
 
-                newMarcador();
-                // editCategoria();
-            } else {
-                console.log(ajax.responseText)
+                var ajaxExtra = new XMLHttpRequest();
+                ajaxExtra.open('POST', '/selectCategoria');
+                ajaxExtra.onload = function () {
+                    if (ajaxExtra.status == 200) {
+                        var jsonExtra = JSON.parse(ajaxExtra.responseText);
+
+                        jsonExtra.forEach(function (item) {
+                            if (idMar == idCorrect && idMar != '' && catCorrect == item.id_tipo) {
+                                html += "<option value='" + item.id_tipo + "' selected>" + item.tipo + "</option>"
+                            } else {
+                                html += "<option value='" + item.id_tipo + "'>" + item.tipo + "</option>"
+                            }
+                        });
+                    }
+
+                    html += "</select></div><div class='row'><h3>Ubicación: </h3><button>Ver en mapa</button></div><div class='submit'>";
+
+                    if (idMar == idCorrect && idMar != '') {
+                        html += "<button id='formulario'>Actualizar</button><button>Eliminar</button></div></form></div>";
+                    } else {
+                        html += "<button>Crear</button></div></form></div>";
+                    }
+
+
+                    popupContent.innerHTML = html;
+
+                    removeClasses();
+                    container.style.zIndex = '999';
+                    popupContent.classList.add('visible');
+                    popupContent.classList.toggle('shifted');
+
+                    newMarcador();
+                    editMarcador();
+                };
+
+                ajaxExtra.send(formdata);
             }
         };
         ajax.send(formdata);
     }
-
 }
+
 
 function buttonClick3(idCat) {
     if (popupContent.classList.contains('shifted2') && !idCat) {
         removeClasses();
         container.style.zIndex = '0';
-        popupContent.classList.remove('visible'); // Ocultar suavemente
+        popupContent.classList.remove('visible');
     } else {
         var formdata = new FormData();
         var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -108,9 +148,7 @@ function buttonClick3(idCat) {
                 var idCorrect = "";
                 var nameCorrect = "";
 
-
                 json.forEach(function (item) {
-
                     if (idCat && item.id_tipo == idCat && idCat != undefined) {
                         html += "<option value='" + item.id_tipo + "' selected>" + item.tipo + "</option>";
                         idCorrect = item.id_tipo
@@ -312,6 +350,111 @@ function elimCategoria(event, idCat) {
 }
 
 /* Funciones marcadores */
+
+function editMarcador() {
+    document.getElementById('selectMarcadores').addEventListener('change', function () {
+        buttonClick2();
+        buttonClick2(document.getElementById('selectMarcadores').value);
+    });
+
+    var updateForm = document.getElementById('updateMarcador');
+    if (updateForm) {
+        updateMarcador(document.getElementById('selectMarcadores').value);
+    }
+}
+
+function updateMarcador(idMar) {
+    document.getElementById('formulario').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        var nombreMar = document.getElementById('nameMarcador').value
+        var descripcionCat = document.getElementById('descMarcador').value
+        var catMar = document.getElementById('catMarcador').value
+
+        if (nombreMar == '' || descripcionCat == '' || catMar == '') {
+
+            document.getElementById('ErrorMarcador').style = 'color: red;'
+            document.getElementById('ErrorMarcador').innerHTML = 'Introduce todos los valores'
+        } else {
+            var formdata = new FormData();
+            var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            formdata.append('_token', csrfToken);
+            formdata.append('nombreMar', nombreMar);
+            formdata.append('descripcionCat', descripcionCat);
+            formdata.append('catMar', catMar);
+            formdata.append('idMar', idMar);
+
+            var ajax = new XMLHttpRequest();
+            ajax.open('POST', '/crearMarcador');
+            ajax.onload = function () {
+                if (ajax.status == 200) {
+                    buttonClick2();
+                    buttonClick2();
+
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1250,
+                        width: "200px",
+                        background: "#293A68"
+                    });
+                } else {
+                    console.log(ajax.responseText)
+                }
+            };
+            ajax.send(formdata);
+
+        }
+    })
+}
+
+function newMarcador() {
+    var createForm = document.getElementById('createMarcador');
+    if (createForm) {
+        document.getElementById('createMarcador').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var nombreMar = document.getElementById('nameMarcador').value
+            var descripcionMar = document.getElementById('descMarcador').value
+            var catMar = document.getElementById('catMarcador').value
+
+            if (nombreMar == '' || descripcionMar == '' || catMar == '') {
+
+                document.getElementById('ErrorMarcador').style = 'color: red;'
+                document.getElementById('ErrorMarcador').innerHTML = 'Introduce todos los valores'
+            } else {
+                var formdata = new FormData();
+                var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                formdata.append('_token', csrfToken);
+                formdata.append('nombreMar', nombreMar);
+                formdata.append('descripcionMar', descripcionMar);
+                formdata.append('catMar', catMar);
+
+                var ajax = new XMLHttpRequest();
+                ajax.open('POST', '/crearMarcador');
+                ajax.onload = function () {
+                    console.log(ajax.responseText)
+                    if (ajax.status == 200) {
+                        buttonClick2();
+                        buttonClick2();
+
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 1250,
+                            width: "200px",
+                            background: "#293A68"
+                        });
+                    }
+                };
+                ajax.send(formdata);
+            }
+        })
+    }
+}
+
 
 
 

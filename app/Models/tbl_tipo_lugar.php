@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbl_tipo_lugar extends Model
 {
+    public $timestamps = false;
+    protected $primaryKey = 'id_tipo-lug';
+
     use HasFactory;
-    protected $table = 'tbl_tipo_lugares';
+    protected $table = 'tbl_tipo-lugares';
 }
