@@ -119,6 +119,7 @@
 
 <div id="perfil">
     <div style="display: flex; align-items: center;">
+        {{dd($modal)}}
         <h4>Bienvenido, {{ $modal->first()->nombre_user }}</h4>
         <button class="buttone" id="chgpwd"><b>Cambiar contraseña</b></button>
     </div>
@@ -235,7 +236,9 @@ $.ajax({
         Swal.fire({
                             icon: 'success',
                             title: 'Usuario actualizado',
-                        });    },
+                        }); 
+                        cargarPerfil();
+   },
     error: function(xhr, status, error) {
         console.error(error);
     }

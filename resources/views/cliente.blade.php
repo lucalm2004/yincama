@@ -146,18 +146,30 @@
 
             <div id="perfil" style="display: none;">
                 <script>
-                    $(document).ready(function() {
-                        $.ajax({
-                            url: '{{ route('perfil.index') }}',
-                            method: 'GET',
-                            success: function(response) {
-                                $('#perfil').html(response);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Hubo un error al obtener las incidencias:', error);
-                            }
-                        });
-                    });
+                    function cargarPerfil() {
+    $.ajax({
+        url: '{{ route('perfil.index') }}',
+        method: 'GET',
+        success: function(response) {
+            $('#perfil').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error('Hubo un error al obtener las incidencias:', error);
+        }
+    });
+}
+                    // $(document).ready(function() {
+                    //     $.ajax({
+                    //         url: '{{ route('perfil.index') }}',
+                    //         method: 'GET',
+                    //         success: function(response) {
+                    //             $('#perfil').html(response);
+                    //         },
+                    //         error: function(xhr, status, error) {
+                    //             console.error('Hubo un error al obtener las incidencias:', error);
+                    //         }
+                    //     });
+                    // });
                 </script>
             </div>
         </div>
@@ -206,6 +218,8 @@
 
         var button2 = document.getElementById('button2');
         button2.onclick = function() {
+            cargarPerfil();
+
             document.getElementById('perfil').style.display = 'grid';
 
             document.getElementById('yinkamas').style.display = 'none';
