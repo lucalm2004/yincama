@@ -119,7 +119,7 @@
 
 <div id="perfil">
     <div style="display: flex; align-items: center;">
-        {{dd($modal)}}
+        {{-- {{dd($modal)}} --}}
         <h4>Bienvenido, {{ $modal->first()->nombre_user }}</h4>
         <button class="buttone" id="chgpwd"><b>Cambiar contraseña</b></button>
     </div>
