@@ -7,7 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" crossorigin="" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+{{-- Ian --}}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" crossorigin="" />
 
     <!-- Esri Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.1.3/dist/esri-leaflet-geocoder.css"
@@ -37,8 +39,6 @@
 
     <!-- Leaflet Locate Control JS -->
     <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
@@ -156,8 +156,9 @@
 
 <body>
     <div class="popup-container">
-        <div id="Favoritos" style="display: none"></div>
         <div id="popup-view" class="popup-content">
+            <div id="Favoritos" style="display: none"></div>
+
             <div id="yinkamas" style="display: none;">
                 <script>
                     $(document).ready(function() {
@@ -221,8 +222,7 @@
     <script>
         var popupContent = document.querySelector('.popup-content');
         var container = document.querySelector('.popup-container');
-        var controlOk;
-        var controlOk2;
+
         function removeClasses() {
             popupContent.classList.remove('shifted');
             popupContent.classList.remove('shifted1');
@@ -234,6 +234,7 @@
         button1.onclick = function() {
             document.getElementById('yinkamas').style.display = 'grid';
             document.getElementById('perfil').style.display = 'none';
+            document.getElementById('Favoritos').style.display = 'none'
 
             if (popupContent.classList.contains('shifted1')) {
                 removeClasses();
@@ -255,6 +256,7 @@
             document.getElementById('perfil').style.display = 'grid';
 
             document.getElementById('yinkamas').style.display = 'none';
+            document.getElementById('Favoritos').style.display = 'none'
 
             if (popupContent.classList.contains('shifted')) {
                 removeClasses();
@@ -273,7 +275,9 @@
         var button3 = document.getElementById('button3');
         button3.onclick = function() {
             document.getElementById('yinkamas').style.display = 'none';
-            document.getElementById('Favoritos').style.display = 'block'
+            document.getElementById('Favoritos').style.display = 'block';
+            document.getElementById('perfil').style.display = 'none';
+
             mostrarFavoritos();
             if (popupContent.classList.contains('shifted2')) {
                 removeClasses();
@@ -292,6 +296,7 @@
         var button4 = document.getElementById('button4');
         button4.onclick = function() {
             document.getElementById('yinkamas').style.display = 'none';
+            document.getElementById('Favoritos').style.display = 'none'
 
             if (popupContent.classList.contains('shifted3')) {
                 removeClasses();
@@ -308,9 +313,8 @@
         };
 
         // Favoritos
-       
-
-
+        var controlOk;
+        var controlOk2;
         function mostrarEvent(event) {
             var como_llegar = document.getElementsByName("btn_llegae");
             console.log(controlOk)
@@ -342,13 +346,9 @@
                         routeWhileDragging: true,
                     }).addTo(map);
                     
-
-                    // FALTA HACER QUE SE MUESTRE UNA RUTA SOLAMENTE Y LAS OTRAS SE BORRAN
                 });
             }
         }
-
-
 
         function mostrarFavoritos() {
             var ajax = new XMLHttpRequest();
@@ -373,14 +373,14 @@
                         contenidoHtml += "<p>" + item.desc_lug + "</p>";
                         if(controlOk2 === false){
                             contenidoHtml +=
-                            "<button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito()'" +
+                            "<button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito("+item.id_lug+")'" +
                             item.id_lug +
                             "' value='" + item.tipo_lug +
                             "'> Favorito </button>";
 
                         }else{
                             contenidoHtml +=
-                            "<button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito()'" +
+                            "<button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito("+item.id_lug+")'" +
                             item.id_lug +
                             "' value='" + item.tipo_lug +
                             "'> Favorito </button><button onclick='mostrarEvent(event)' type='button' name='btn_llegae' id='" +
@@ -410,6 +410,17 @@
 
             ajax.send(formdata);
         }
+        var map = L.map('map', {
+            zoomControl: false
+        }).setView([41.3851, 2.1734], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // L.control.zoom({
+        //     position: 'bottomright'
+        // }).addTo(map);
 
         ListarLugares();
         var lc = L.control.locate({
@@ -454,6 +465,8 @@
                     if (lugares && lugares.length > 0) {
                         lugares.forEach(function(lugar) {
                             var latitud = parseFloat(lugar.latitud_lug);
+                            console.log(latitud)
+
                             var longitud = parseFloat(lugar.longitud_lug);
                             if (!isNaN(latitud) && !isNaN(longitud)) {
                                 var marker = L.marker([latitud, longitud], {
@@ -548,13 +561,15 @@
             ajax.send(formdata);
         }
 
-        function darFavorito(csrfToken) {
+
+        function darFavorito(id) {
             var ajax = new XMLHttpRequest();
             var formdata = new FormData();
 
             // Agrega el token CSRF al FormData
             var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             formdata.append('_token', csrfToken);
+            formdata.append('id_lugar', id);
 
             ajax.open('POST', '/añadir_like');
 
@@ -600,19 +615,8 @@
 
 
 
-        var map = L.map('map', {
-            zoomControl: false
-        }).setView([41.3851, 2.1734], 13);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        L.control.zoom({
-            position: 'bottomright'
-        }).addTo(map);
+        
     </script>
-    <script></script>
 </body>
 
 </html>

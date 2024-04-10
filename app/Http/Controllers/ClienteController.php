@@ -7,13 +7,15 @@ use App\Models\tbl_etiqueta; // Importar el modelo tbl_etiquetas
 use App\Models\tbl_usuarios; // Importar el modelo tbl_user
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+
 
 class ClienteController extends Controller
 {
-    // public function redirecion_pagina()
-    // {
-    //     return view('cliente.index');
-    // }
+    public function redirecion_pagina()
+    {
+        return view('cliente');
+    }
 
     public function listar_lugares()
     {
@@ -26,8 +28,8 @@ class ClienteController extends Controller
     {
         // Obtener los datos del formulario AJAX
         // $idLug = $request->id('btn_fav');
-        $idUsuario = 2;
-        $idLug = 2;
+        $idUsuario = Session::get('id_user');
+        $idLug = $_POST['id_lugar'];
 
         // $username = session('cliente');
     
@@ -74,15 +76,16 @@ public function mostrar_favorito()
 
        
 
-$idUsuario = 2;
-$idLug = 2;
+        $idUsuario = Session::get('id_user');
+
+// $idLug = 1;
 
 $sql = 'SELECT l.*
         FROM tbl_etiquetas e 
         INNER JOIN tbl_lugares l ON l.id_lug = e.id_lug_fk
         INNER JOIN tbl_usuario u ON u.id_user = e.id_user_fk
-        WHERE e.id_user_fk = ? AND e.id_lug_fk = ?';
-$favoritos = DB::select($sql, [$idUsuario, $idLug]);
+        WHERE e.id_user_fk = ?';
+$favoritos = DB::select($sql, [$idUsuario]);
 return response()->json(['favoritos' => $favoritos]);
     }
 
