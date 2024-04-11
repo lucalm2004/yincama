@@ -16,16 +16,7 @@ function removeClasses() {
 
 var button1 = document.getElementById('button1');
 button1.onclick = function () {
-    if (popupContent.classList.contains('shifted1')) {
-        removeClasses();
-        container.style.zIndex = '0'; // Modified
-        popupContent.classList.remove('visible'); // Ocultar suavemente
-    } else {
-        removeClasses();
-        container.style.zIndex = '999'; // Modified
-        popupContent.classList.add('visible'); // Mostrar suavemente
-        popupContent.classList.toggle('shifted1');
-    }
+    buttonClick1();
 };
 
 var button2 = document.getElementById('button2');
@@ -37,6 +28,57 @@ var button3 = document.getElementById('button3');
 button3.onclick = function () {
     buttonClick3();
 };
+
+function buttonClick1(idYin) {
+    if (popupContent.classList.contains('shifted1') && !idYin) {
+        removeClasses();
+        container.style.zIndex = '0';
+        popupContent.classList.remove('visible');
+    } else {
+        var formdata = new FormData();
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        formdata.append('_token', csrfToken);
+
+        var ajax = new XMLHttpRequest();
+        ajax.open('POST', '/selectYincana');
+        ajax.onload = function () {
+            if (ajax.status == 200) {
+                console.log(ajax.responseText)
+
+                var json = JSON.parse(ajax.responseText);
+                var html = "<div><h3>Tus Gincanas:</h3><div class='row'><select><option></option>";
+                var idCorrect = "";
+                var nameCorrect = "";
+
+                json.forEach(function (item) {
+                    if (idYin && item.id_tipo == idYin && idYin != undefined) {
+                    } else {
+                        html += "<option value='" + item.id_gim + "'>" + item.nombre_gim + "</option>";
+                    }
+                });
+
+                html += "</select></div></div><hr><div>";
+
+
+                if (idYin == idCorrect && idYin != '') {
+                } else {
+                    html += "";
+                }
+                popupContent.innerHTML = html;
+
+                removeClasses();
+
+                container.style.zIndex = '999';
+                popupContent.classList.add('visible');
+                popupContent.classList.toggle('shifted2');
+
+                // newCategoria();
+                // editCategoria();
+            }
+        };
+        ajax.send(formdata);
+    }
+}
 
 function buttonClick2(idMar) {
     if (popupContent.classList.contains('shifted') && !idMar) {
@@ -74,7 +116,7 @@ function buttonClick2(idMar) {
                     }
                 });
 
-                console.log(idMar + ' ' + idCorrect)
+                // console.log(idMar + ' ' + idCorrect)
 
                 if (idMar == idCorrect && idMar != '') {
                     html += "</select></div><hr class='separator'><form id='updateMarcador'><span id='ErrorMarcador'></span><div><div class='row'><h3>Nombre: </h3><input id='nameMarcador' type='text' value='" + nameCorrect + "'></div><div class='row'><h3>Descripción: </h3><input id='descMarcador' type='text' value='" + descCorrect + "'></div><div class='row'>";
@@ -103,7 +145,7 @@ function buttonClick2(idMar) {
                     html += "</select></div><div class='row'><h3>Ubicación: </h3><button>Ver en mapa</button></div><div class='submit'>";
 
                     if (idMar == idCorrect && idMar != '') {
-                        html += "<button id='formulario'>Actualizar</button><button>Eliminar</button></div></form></div>";
+                        html += "<button id='formulario'>Actualizar</button><button onclick='elimMarcador(event, " + idCorrect + ")' >Eliminar</button></div></form></div>";
                     } else {
                         html += "<button>Crear</button></div></form></div>";
                     }
@@ -127,7 +169,6 @@ function buttonClick2(idMar) {
     }
 }
 
-
 function buttonClick3(idCat) {
     if (popupContent.classList.contains('shifted2') && !idCat) {
         removeClasses();
@@ -142,7 +183,6 @@ function buttonClick3(idCat) {
         ajax.open('POST', '/selectCategoria');
         ajax.onload = function () {
             if (ajax.status == 200) {
-
                 var json = JSON.parse(ajax.responseText);
                 var html = "<div><div><h3>Categorias de marcador:</h3><select id='selectCategorias'><option value=''></option>";
                 var idCorrect = "";
@@ -165,7 +205,7 @@ function buttonClick3(idCat) {
                 } else {
                     html += "</select></div><hr class='separator'><form id='createCategory'><span id='Error'></span><div class='row'><h3>Nombre: </h3>"
                     html += "<input type='text' id='nameCategory'></input>"
-                    html += "</div><div class='submit'><button>Crear</button></div></form></div>";
+                    html += "</div><div class='submit'><button>Crear</button></div></form ></div > ";
                 }
                 popupContent.innerHTML = html;
 
@@ -384,6 +424,8 @@ function updateMarcador(idMar) {
             formdata.append('catMar', catMar);
             formdata.append('idMar', idMar);
 
+            console.log(catMar)
+
             var ajax = new XMLHttpRequest();
             ajax.open('POST', '/crearMarcador');
             ajax.onload = function () {
@@ -434,7 +476,7 @@ function newMarcador() {
                 var ajax = new XMLHttpRequest();
                 ajax.open('POST', '/crearMarcador');
                 ajax.onload = function () {
-                    console.log(ajax.responseText)
+                    // console.log(ajax.responseText)
                     if (ajax.status == 200) {
                         buttonClick2();
                         buttonClick2();
@@ -454,6 +496,63 @@ function newMarcador() {
         })
     }
 }
+
+function elimMarcador(event, idMar) {
+    event.preventDefault();
+
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: "btn btn-success btn-lg",
+            cancelButton: "btn btn-danger btn-lg"
+        },
+        buttonsStyling: true
+    });
+
+    swalWithBootstrapButtons.fire({
+        title: "Seguro que quiere eliminarlo?",
+        text: "Este cambio será permanente",
+        icon: "warning",
+        color: "#fff",
+        showCancelButton: true,
+        position: "top-end",
+        cancelButtonText: "No",
+        confirmButtonText: "Si",
+        reverseButtons: true,
+        background: "#293A68"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var formdata = new FormData();
+            var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            formdata.append('_token', csrfToken);
+            formdata.append('idMar', idMar);
+
+            var ajax = new XMLHttpRequest();
+            ajax.open('POST', '/elimMarcador');
+            ajax.onload = function () {
+                if (ajax.status == 200) {
+                    buttonClick2();
+                    buttonClick2();
+
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1250,
+                        width: "200px",
+                        background: "#293A68"
+                    });
+                }
+            };
+            ajax.send(formdata);
+        }
+    });
+
+
+
+}
+
+
+/* Funciones jincana */
 
 
 

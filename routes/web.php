@@ -18,3 +18,9 @@ Route::post('/elimCategoria', [adminController::class, 'elimCategoria'])->name('
 
 Route::post('/selectMarcador', [adminController::class, 'selectMarcador'])->name('selectMarcador');
 Route::post('/crearMarcador', [adminController::class, 'crearMarcador'])->name('crearMarcador');
+Route::post('/elimMarcador', [adminController::class, 'elimMarcador'])->name('elimMarcador');
+
+
+Route::post('/selectYincana', [adminController::class, 'selectYincana'])->name('selectYincana');
+Route::post('/crearYincana', [adminController::class, 'crearYincana'])->name('crearYincana');
+Route::post('/elimYincana', [adminController::class, 'elimYincana'])->name('elimYincana');
