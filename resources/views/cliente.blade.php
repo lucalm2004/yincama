@@ -1,3 +1,10 @@
+<?php
+if (!session('id_user')){
+        header("Location: /");
+        exit();
+    }
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -7,7 +14,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" crossorigin="" />
 
     <!-- Esri Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.1.3/dist/esri-leaflet-geocoder.css" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.1.3/dist/esri-leaflet-geocoder.css"
+        crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
     <!-- Leaflet Locate Control CSS -->
@@ -33,14 +41,17 @@
 
     <!-- Leaflet Locate Control JS -->
     <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
-   
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
+        #Favoritos{
+            max-height: 100%;
+            overflow-y: scroll;
+        }
         body,
         html {
             font-family: "Inter", sans-serif;
@@ -87,6 +98,23 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+
+        .leaflet-popup-close-button {
+            background-color: black !important;
+            color: white !important;
+            /* padding: 1.5% 4%!important; */
+            margin: 1%;
+            border-radius: 100% !important;
+        }
+
+        .leaflet-popup{
+            width: 200px;
+        }
+
+        .leaflet-top {
+            margin-top: 25% !important
         }
 
         .popup-content {
@@ -143,6 +171,23 @@
 
         }
 
+        .favorito{
+            background-color: black!important;
+    border-radius: 20px;
+    padding: 5%;
+    margin-bottom: 2%;
+    /* border: 1px solid black; */
+        }
+
+        .btn_llegar {
+
+            border: none;
+
+    background-color: #F9F7D0;
+    height: 25px;
+    border-radius: 1rem;
+    border: 1px solid;
+        }
 
         .popup-content.shifted3::after {
             left: calc(91% - 15px);
@@ -154,7 +199,7 @@
 </head>
 
 <body>
-    <div class="popup-container">
+    <div id="popup-container" class="popup-container">
         <div id="popup-view" class="popup-content">
             <div id="Favoritos" style="display: none"></div>
 
@@ -178,17 +223,17 @@
             <div id="perfil" style="display: none;">
                 <script>
                     function cargarPerfil() {
-    $.ajax({
-        url: '{{ route('perfil.index') }}',
-        method: 'GET',
-        success: function(response) {
-            $('#perfil').html(response);
-        },
-        error: function(xhr, status, error) {
-            console.error('Hubo un error al obtener las incidencias:', error);
-        }
-    });
-}
+                        $.ajax({
+                            url: '{{ route('perfil.index') }}',
+                            method: 'GET',
+                            success: function(response) {
+                                $('#perfil').html(response);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Hubo un error al obtener las incidencias:', error);
+                            }
+                        });
+                    }
                     // $(document).ready(function() {
                     //     $.ajax({
                     //         url: '{{ route('perfil.index') }}',
@@ -206,7 +251,7 @@
         </div>
     </div>
 
-   
+
 
     <div id="map"></div>
 
@@ -320,14 +365,14 @@
             console.log(controlOk)
 
             if (controlOk === false) {
-                        routingControl.spliceWaypoints(0, 1); // Elimina el marcador de inicio (índice 0)
-                        routingControl.spliceWaypoints(routingControl.getWaypoints().length - 1,
-                        1); // Elimina el marcador de destino (último índice)
-                        console.log(controlOk)
-                        
-                    }
-                    controlOk = true;
-                     controlOk2 = false;
+                routingControl.spliceWaypoints(0, 1); // Elimina el marcador de inicio (índice 0)
+                routingControl.spliceWaypoints(routingControl.getWaypoints().length - 1,
+                    1); // Elimina el marcador de destino (último índice)
+                console.log(controlOk)
+
+            }
+            controlOk = true;
+            controlOk2 = false;
 
 
             document.getElementById('popup-container').style.zIndex = 0;
@@ -345,7 +390,7 @@
                         ],
                         routeWhileDragging: true,
                     }).addTo(map);
-                    
+
                 });
             }
         }
@@ -368,27 +413,32 @@
                     var contenidoHtml = ''; // Variable para almacenar el contenido HTML
 
                     favoritos.forEach(function(item) {
+                        contenidoHtml += "<div class='favorito'>"
                         contenidoHtml += "<h3>" + item.nombre_lug + "</h3>";
                         contenidoHtml += "<p>" + item.barrio_lug + "</p>";
                         contenidoHtml += "<p>" + item.desc_lug + "</p>";
-                        if(controlOk2 === false){
+                        if (controlOk2 === false) {
                             contenidoHtml +=
-                            "<button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito("+item.id_lug+")'" +
-                            item.id_lug +
-                            "' value='" + item.tipo_lug +
-                            "'> Favorito </button>";
+                                "<button type='button' class='btn_llegar' id='btn_fav' onclick='darFavorito(" +
+                                item.id_lug + ")'" +
+                                item.id_lug +
+                                "' value='" + item.tipo_lug +
+                                "'> Quitar de Favoritos </button>";
 
-                        }else{
+                        } else {
                             contenidoHtml +=
-                            "<button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito("+item.id_lug+")'" +
-                            item.id_lug +
-                            "' value='" + item.tipo_lug +
-                            "'> Favorito </button><button onclick='mostrarEvent(event)' type='button' name='btn_llegae' id='" +
-                            item.latitud_lug + "' value='" + item.longitud_lug +
-                            "' class='btn'>Como Llegar</button>";
+                                "<button type='button' class='btn_llegar' id='btn_fav' onclick='darFavorito(" +
+                                item.id_lug + ")'" +
+                                item.id_lug +
+                                "' value='" + item.tipo_lug +
+                                "'> Quitar de Favoritos </button><button onclick='mostrarEvent(event)' type='button' name='btn_llegae' id='" +
+                                item.latitud_lug + "' value='" + item.longitud_lug +
+                                "' class='btn btn_llegar'>Como Llegar</button>";
 
                         }
-                       
+                        contenidoHtml += "</div>"
+
+
 
                     });
 
@@ -415,7 +465,7 @@
         }).setView([41.3851, 2.1734], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution: '&copy; <a href="https://github.com/lucalm2004/yincama">GitHub</a> repository'
         }).addTo(map);
 
         // L.control.zoom({
@@ -473,16 +523,11 @@
                                     icon: icono
                                 }).addTo(map);
                                 marker.bindPopup("<div><h2 style='margin-bottom: -20px'>" + lugar.barrio_lug +
-                                        "</h2> <p style='color: grey'>" + lugar.nombre_lug +
-                                        "</p> <hr> <p>" + lugar.desc_lug +
-                                        "</p><button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito("+ lugar.id_lug+")'" +
-                                        lugar.id_lug +
-                                        "' value='" + lugar.tipo_lug +
-                                        "'> Favorito </button><button type='button' name='btn_llegar' id='" +
-                                        lugar.latitud_lug + "' value='" + lugar.longitud_lug +
-                                        "' class='btn'  >Como Llegar</button></div>"
+                                        "</h2> <p style='color: grey;margin-bottom: -5px;'>" + lugar.nombre_lug +
+                                        "</p> <hr> <p style='text-align: justify;margin-top: -4px;''>" + lugar.desc_lug +
+                                        "</p><div style='gap: 40%;display: flex; flex-direction: row; justify-content: center; align-items: center;'><button type='button' class='btn_llegar' id='btn_fav' onclick='darFavorito(`" + lugar.id_lug + "`)'" + lugar.id_lug + "' value='" + lugar.tipo_lug + "'><i class='fa-solid fa-star'></i></button><span style='left: 12.5%;top: 91.5%;position: absolute;'>Me Gusta</span><button class='btn_llegar' type='button' name='btn_llegar' id='" + lugar.latitud_lug + "' value='" + lugar.longitud_lug + "' class='btn'><i class='fa-solid fa-diamond-turn-right'></i></button><span style='left: 55%;top: 91.5%;position: absolute;'>Como llegar</span></div><br>"
                                     )
-                                    .openPopup();
+                                    // .openPopup();
 
                                 // var routingControl
                                 marker.on("click", function() {
@@ -493,15 +538,17 @@
                                     console.log(controlOk2)
 
                                     if (controlOk === true || controlOk2 === true) {
-                        routingControl.spliceWaypoints(0, 1); // Elimina el marcador de inicio (índice 0)
-                        routingControl.spliceWaypoints(routingControl.getWaypoints().length - 1,
-                        1); // Elimina el marcador de destino (último índice)
+                                        routingControl.spliceWaypoints(0,
+                                        1); // Elimina el marcador de inicio (índice 0)
+                                        routingControl.spliceWaypoints(routingControl.getWaypoints()
+                                            .length - 1,
+                                            1); // Elimina el marcador de destino (último índice)
 
                                         controlOk2 = false;
-                    }
-                    controlOk2 = true;
+                                    }
+                                    controlOk2 = true;
 
-                    controlOk = false;
+                                    controlOk = false;
 
                                     for (let i = 0; i < como_llegar.length; i++) {
                                         como_llegar[i].addEventListener("click", function(evt) {
@@ -611,11 +658,6 @@
 
             ajax.send(formdata);
         }
-
-
-
-
-        
     </script>
 </body>
 

@@ -1,3 +1,10 @@
+<?php
+if (!session('id_user')){
+        header("Location: /");
+        exit();
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -71,7 +78,15 @@
             padding-left: 3%;
 
         }
+        .btn_llegar{
 
+border: none;
+width: 50%;
+margin: 0.75rem 25%;
+background-color: #F9F7D0;
+height: 50%;
+border-radius: 1rem;
+}
         .row button {
             border: none;
             width: 50%;
@@ -102,6 +117,8 @@
             padding-bottom: 3%;
             padding-left: 3%;
         }
+
+       
 
         #yinkamas {
             max-height: 100%;
