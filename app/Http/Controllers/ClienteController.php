@@ -72,18 +72,12 @@ public function mostrar_favorito()
     {
        
 
-        // Consultar las rutas de las imágenes y los títulos de las películas
-
-
-// $query = "SELECT  u.nombre_user, l.nombre_lug, barrio_lug, desc_lug
-// FROM tbl_etiquetas e
-// INNER JOIN tbl_lugares l ON l.id_lug = e.id_lug_fk
-// INNER JOIN tbl_usuario u ON u.id_user = e.id_user_fk";
+       
 
 $idUsuario = 2;
 $idLug = 2;
 
-$sql = 'SELECT l.nombre_lug, l.barrio_lug, l.desc_lug  
+$sql = 'SELECT l.*
         FROM tbl_etiquetas e 
         INNER JOIN tbl_lugares l ON l.id_lug = e.id_lug_fk
         INNER JOIN tbl_usuario u ON u.id_user = e.id_user_fk

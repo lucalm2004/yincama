@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" crossorigin="" />
 
     <!-- Esri Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.1.3/dist/esri-leaflet-geocoder.css" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.1.3/dist/esri-leaflet-geocoder.css"
+        crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
     <!-- Leaflet Locate Control CSS -->
@@ -37,6 +38,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
+        .leaflet-top {
+            margin-top: 30% !important
+        }
+
         body,
         html {
             margin: 0;
@@ -125,6 +130,10 @@
             transition: opacity 0.5s ease;
         }
 
+        .leaflet-right {
+            padding-left: 50%
+        }
+
         .popup-content.shifted::after {
             left: calc(36.5% - 15px);
             opacity: 1;
@@ -157,8 +166,9 @@
 </head>
 
 <body>
-    <div class="popup-container">
+    <div id="popup-container" class="popup-container">
         <div class="popup-content" id="ventana_azul">
+            <div id="Favoritos" style="display: block;"></div>
         </div>
     </div>
 
@@ -169,12 +179,11 @@
         <div id='button2' class='button'></div>
         <div id='button3' class='button'></div>
         <div id='button4' class='button'></div>
-        <img src="{{ asset('/img/estrella.png') }}" alt="Estrella favorita">
     </div>
 
-    
-   
-   <script>
+
+
+    <script>
         var popupContent = document.querySelector('.popup-content');
         var container = document.querySelector('.popup-container');
 
@@ -187,6 +196,7 @@
 
         var button1 = document.getElementById('button1');
         button1.onclick = function() {
+            document.getElementById('Favoritos').style.display = 'none'
 
             if (popupContent.classList.contains('shifted1')) {
                 removeClasses();
@@ -203,6 +213,7 @@
 
         var button2 = document.getElementById('button2');
         button2.onclick = function() {
+            document.getElementById('Favoritos').style.display = 'none'
 
             if (popupContent.classList.contains('shifted')) {
                 removeClasses();
@@ -218,8 +229,12 @@
             }
         };
 
+     
         var button3 = document.getElementById('button3');
         button3.onclick = function() {
+            document.getElementById('Favoritos').style.display = 'block'
+            mostrarFavoritos();
+
             if (popupContent.classList.contains('shifted2')) {
                 removeClasses();
                 // console.log("Lpd")
@@ -227,47 +242,7 @@
 
 
 
-mostrarFavoritos();
-function mostrarFavoritos() {
-    var ajax = new XMLHttpRequest();
-    var formdata = new FormData();
 
-    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    formdata.append('_token', csrfToken);
-
-    ajax.open('POST', '/mostrar_favorito');
-
-    ajax.onload = function () {
-        if (ajax.status == 200) {
-            var json = JSON.parse(ajax.responseText);
-            var favoritos = json.favoritos;
-
-            var contenidoHtml = '';  // Variable para almacenar el contenido HTML
-
-            favoritos.forEach(function (item) {
-                contenidoHtml += "<h3>" + item.nombre_lug + "</h3>";
-                contenidoHtml += "<p>" + item.barrio_lug + "</p>";
-                contenidoHtml += "<p>" + item.desc_lug + "</p>";
-            });
-
-            // Mostrar el contenido en el elemento con id 'ventana_azul'
-            var ventanaAzul = document.getElementById("ventana_azul");
-            if (ventanaAzul) {
-                ventanaAzul.innerHTML = contenidoHtml;
-            } else {
-                console.error('Error: No se encontró el elemento con id "ventana_azul"');
-            }
-        } else {
-            console.error('Error en la petición AJAX');
-        }
-    };
-
-    ajax.onerror = function() {
-        console.error('Error en la petición AJAX');
-    };
-
-    ajax.send(formdata);
-}
 
 
                 container.style = 'z-index: 0;'
@@ -282,8 +257,114 @@ function mostrarFavoritos() {
             }
         };
 
+        var controlOk;
+        var controlOk2;
+
+
+        function mostrarEvent(event) {
+            var como_llegar = document.getElementsByName("btn_llegae");
+            console.log(controlOk)
+
+            if (controlOk === false) {
+                        routingControl.spliceWaypoints(0, 1); // Elimina el marcador de inicio (índice 0)
+                        routingControl.spliceWaypoints(routingControl.getWaypoints().length - 1,
+                        1); // Elimina el marcador de destino (último índice)
+                        console.log(controlOk)
+                        
+                    }
+                    controlOk = true;
+                     controlOk2 = false;
+
+
+            document.getElementById('popup-container').style.zIndex = 0;
+            for (let i = 0; i < como_llegar.length; i++) {
+                var latitud = event.target.id;
+                var longitud = event.target.value;
+                console.log(latitud);
+                console.log(longitud);
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var currentLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
+                    routingControl = L.Routing.control({
+                        waypoints: [
+                            currentLatLng,
+                            L.latLng(latitud, longitud)
+                        ],
+                        routeWhileDragging: true,
+                    }).addTo(map);
+                    
+
+                    // FALTA HACER QUE SE MUESTRE UNA RUTA SOLAMENTE Y LAS OTRAS SE BORRAN
+                });
+            }
+        }
+
+
+
+        function mostrarFavoritos() {
+            var ajax = new XMLHttpRequest();
+            var formdata = new FormData();
+
+            var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            formdata.append('_token', csrfToken);
+
+            ajax.open('POST', '/mostrar_favorito');
+
+            ajax.onload = function() {
+                if (ajax.status == 200) {
+
+                    var json = JSON.parse(ajax.responseText);
+                    var favoritos = json.favoritos;
+
+                    var contenidoHtml = ''; // Variable para almacenar el contenido HTML
+
+                    favoritos.forEach(function(item) {
+                        contenidoHtml += "<h3>" + item.nombre_lug + "</h3>";
+                        contenidoHtml += "<p>" + item.barrio_lug + "</p>";
+                        contenidoHtml += "<p>" + item.desc_lug + "</p>";
+                        if(controlOk2 === false){
+                            contenidoHtml +=
+                            "<button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito()'" +
+                            item.id_lug +
+                            "' value='" + item.tipo_lug +
+                            "'> Favorito </button>";
+
+                        }else{
+                            contenidoHtml +=
+                            "<button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito()'" +
+                            item.id_lug +
+                            "' value='" + item.tipo_lug +
+                            "'> Favorito </button><button onclick='mostrarEvent(event)' type='button' name='btn_llegae' id='" +
+                            item.latitud_lug + "' value='" + item.longitud_lug +
+                            "' class='btn'>Como Llegar</button>";
+
+                        }
+                       
+
+                    });
+
+                    // Mostrar el contenido en el elemento con id 'ventana_azul'
+                    var ventanaAzul = document.getElementById("Favoritos");
+                    if (ventanaAzul) {
+                        ventanaAzul.innerHTML = contenidoHtml;
+                    } else {
+                        console.error('Error: No se encontró el elemento con id "ventana_azul"');
+                    }
+                } else {
+                    console.error('Error en la petición AJAX');
+                }
+            };
+
+            ajax.onerror = function() {
+                console.error('Error en la petición AJAX');
+            };
+
+            ajax.send(formdata);
+        }
+
         var button4 = document.getElementById('button4');
         button4.onclick = function() {
+            document.getElementById('Favoritos').style.display = 'none'
+
             if (popupContent.classList.contains('shifted3')) {
                 removeClasses();
                 container.style = 'z-index: 0;'
@@ -332,8 +413,8 @@ function mostrarFavoritos() {
         const apiKey =
             "AAPK81ad74d3dfd8436fb340536133638fa63ALxp-zis1f4_UJQXProlf6PHzR0q-zOvEnfcnjIbYi2VLIrKWd86ViJHzwjoKVJ";
 
-            const apiKey2 =
-        "https://nominatim.openstreetmap.org/search?q=1600+Amphitheatre+Parkway,+Mountain+View,+CA&format=json";
+        const apiKey2 =
+            "https://nominatim.openstreetmap.org/search?q=1600+Amphitheatre+Parkway,+Mountain+View,+CA&format=json";
 
         lc.start();
         // darFavorito();
@@ -379,32 +460,61 @@ function mostrarFavoritos() {
                                         "' class='btn'  >Como Llegar</button></div>"
                                     )
                                     .openPopup();
-                                    
-                                    
-                                    // var routingControl
+
+                                // var routingControl
                                 marker.on("click", function() {
                                     // console.log("Marker clicked:", lugar.nombre_lug, lugar.barrio_lug,
                                     //     lugar.desc_lug);
                                     var como_llegar = document.getElementsByName("btn_llegar");
+                                    console.log(controlOk)
+                                    console.log(controlOk2)
+
+                                    if (controlOk === true || controlOk2 === true) {
+                        routingControl.spliceWaypoints(0, 1); // Elimina el marcador de inicio (índice 0)
+                        routingControl.spliceWaypoints(routingControl.getWaypoints().length - 1,
+                        1); // Elimina el marcador de destino (último índice)
+
+                                        controlOk2 = false;
+                    }
+                    controlOk2 = true;
+
+                    controlOk = false;
+
                                     for (let i = 0; i < como_llegar.length; i++) {
-                                       
                                         como_llegar[i].addEventListener("click", function(evt) {
                                             var latitud = evt.target.id
                                             var longitud = evt.target.value
                                             console.log(latitud)
                                             console.log(longitud)
-                                            navigator.geolocation.getCurrentPosition(function(position) {
-                                                var currentLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
-                                             routingControl = L.Routing.control({
+                                            navigator.geolocation.getCurrentPosition(function(
+                                                position) {
+                                                var currentLatLng = L.latLng(position
+                                                    .coords.latitude, position
+                                                    .coords.longitude);
+                                                var targetLatLng = L.latLng(latitud,
+                                                    longitud);
 
+                                                routingControl = L.Routing.control({
                                                     waypoints: [
                                                         currentLatLng,
-                                                        L.latLng(latitud,
-                                                            longitud)
-                                                    ],  routeWhileDragging: true,     }).addTo(map);      
-                                                // FALTA HACER QUE SE MUESTRE UNA RUTA SOLAMENTE Y LAS OTRAS SE BORRAN
+                                                        targetLatLng
+                                                    ],
+                                                    routeWhileDragging: true,
+                                                }).addTo(map);
 
-                                            })
+                                                // Agregar un evento al modal para cerrarlo al hacer clic en la cruz de cerrar
+                                                routingControl.on('routingerror',
+                                                    function(e) {
+                                                        if (e.error.status ===
+                                                            200) {
+                                                            // Ruta encontrada, cerrar el modal
+                                                            // Aquí puedes agregar el código para cerrar el modal según cómo esté implementado en tu página
+                                                            // Por ejemplo, si estás usando Bootstrap, puedes cerrar el modal así:
+                                                            // $('#myModal').modal('hide');
+                                                        }
+                                                    });
+                                            });
+
                                         })
                                     }
 
@@ -451,7 +561,7 @@ function mostrarFavoritos() {
             ajax.onload = function() {
                 if (ajax.status === 200) {
                     console.log(ajax.responseText);
-                    
+
                     try {
                         var resultado = JSON.parse(ajax.responseText);
                         console.log(resultado); // Mostrar la respuesta JSON en la consola
