@@ -4,16 +4,10 @@
 <head>
     <title>Leaflet Map with Icons</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-{{-- Ian --}}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" crossorigin="" />
 
     <!-- Esri Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.1.3/dist/esri-leaflet-geocoder.css"
-        crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.1.3/dist/esri-leaflet-geocoder.css" crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
     <!-- Leaflet Locate Control CSS -->
@@ -39,6 +33,11 @@
 
     <!-- Leaflet Locate Control JS -->
     <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+   
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
@@ -218,7 +217,7 @@
         <div id='button4' class='button'></div>
     </div>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    {{-- <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" crossorigin=""></script> --}}
     <script>
         var popupContent = document.querySelector('.popup-content');
         var container = document.querySelector('.popup-container');
@@ -315,6 +314,7 @@
         // Favoritos
         var controlOk;
         var controlOk2;
+
         function mostrarEvent(event) {
             var como_llegar = document.getElementsByName("btn_llegae");
             console.log(controlOk)
@@ -475,7 +475,7 @@
                                 marker.bindPopup("<div><h2 style='margin-bottom: -20px'>" + lugar.barrio_lug +
                                         "</h2> <p style='color: grey'>" + lugar.nombre_lug +
                                         "</p> <hr> <p>" + lugar.desc_lug +
-                                        "</p><button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito()'" +
+                                        "</p><button type='button''class='btn_llegar' id='btn_fav' onclick='darFavorito("+ lugar.id_lug+")'" +
                                         lugar.id_lug +
                                         "' value='" + lugar.tipo_lug +
                                         "'> Favorito </button><button type='button' name='btn_llegar' id='" +

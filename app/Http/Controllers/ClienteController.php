@@ -19,7 +19,10 @@ class ClienteController extends Controller
 
     public function listar_lugares()
     {
-        $lugares = tbl_lugar::all();
+        // $lugares = tbl_lugar::all();
+        $sql = 'SELECT * FROM tbl_lugares';
+        $lugares = DB::select($sql);
+    
         return response()->json(['lugares' => $lugares]);
     }
     

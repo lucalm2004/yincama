@@ -29,7 +29,7 @@ Route::get('/agregaGrupo', [GrupoController::class, 'agregaGrupo']);
 Route::post('/cambiarpwd', [modalPerfilController::class, 'cambiarPwd']);
 
 
-Route::get('/cliente', [ClienteController::class, 'redirecion_pagina']) ->name('redirecion_pagina');
+// Route::get('/cliente', [ClienteController::class, 'redirecion_pagina']) ->name('redirecion_pagina');
 
 Route::post('/cliente', [ClienteController::class, 'listar_lugares']) ->name('listar_lugares');
 
