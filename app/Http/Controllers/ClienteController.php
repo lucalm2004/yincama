@@ -18,6 +18,7 @@ class ClienteController extends Controller
     public function listar_lugares()
     {
         $lugares = tbl_lugar::all();
+        dd($lugares);
         return response()->json(['lugares' => $lugares]);
     }
     
