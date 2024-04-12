@@ -1,9 +1,5 @@
 /* Botones */
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Code to run when DOM content is loaded
-});
-
 var popupContent = document.querySelector('.popup-content');
 var container = document.querySelector('.popup-container');
 
@@ -42,38 +38,80 @@ function buttonClick1(idYin) {
         var ajax = new XMLHttpRequest();
         ajax.open('POST', '/selectYincana');
         ajax.onload = function () {
-            if (ajax.status == 200) {
-                console.log(ajax.responseText)
 
+            console.log(ajax.responseText)
+
+            if (ajax.status == 200) {
                 var json = JSON.parse(ajax.responseText);
-                var html = "<div><h3>Tus Gincanas:</h3><div class='row'><select><option></option>";
+                var html = "<div><h3>Tus Gincanas:</h3><div class='row'><select id='selectYincana' ><option></option>";
                 var idCorrect = "";
                 var nameCorrect = "";
 
                 json.forEach(function (item) {
-                    if (idYin && item.id_tipo == idYin && idYin != undefined) {
+                    if (idYin && item.id_gim == idYin && idYin != undefined) {
+                        html += "<option value='" + item.id_gim + "' selected>" + item.nombre_gim + "</option>";
+                        idCorrect = item.id_gim;
+                        nameCorrect = item.nombre_gim;
+
                     } else {
                         html += "<option value='" + item.id_gim + "'>" + item.nombre_gim + "</option>";
                     }
                 });
 
-                html += "</select></div></div><hr><div>";
-
+                html += "</select></div></div><hr><div><form id='createYincana'><span id='ErrorYincana'></span>";
 
                 if (idYin == idCorrect && idYin != '') {
+                    html += "<div class='row h3-exception'><h3>Nombre: </h3><input id='nameYincana' type='text' value='" + nameCorrect + "'></div>"
                 } else {
-                    html += "";
+                    html += "<div class='row h3-exception'><h3>Nombre: </h3><input id='nameYincana' type='text'></div>"
                 }
-                popupContent.innerHTML = html;
 
-                removeClasses();
+                var formdata = new FormData();
+                var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                formdata.append('_token', csrfToken);
 
-                container.style.zIndex = '999';
-                popupContent.classList.add('visible');
-                popupContent.classList.toggle('shifted2');
+                var ajaxExtra = new XMLHttpRequest();
+                ajaxExtra.open('POST', '/selectMarcador');
+                ajaxExtra.onload = function () {
+                    if (ajaxExtra.status == 200) {
+                        html += "<div class='locations'>"
+                        var num = 5;
 
-                // newCategoria();
-                // editCategoria();
+                        // console.log(ajaxExtra.responseText)
+
+                        for (var i = 0; i < num; i++) {
+                            html += "<div class='row'><h3>" + (i + 1) + ":</h3><div class='row-before'><select id='marc-" + (i + 1) + "'class='row-exception'><option></option>"
+
+                            var jsonExtra = JSON.parse(ajaxExtra.responseText);
+
+                            jsonExtra.forEach(function (item) {
+                                html += "<option value='" + item.id_lug + "'>" + item.nombre_lug + "</option>";
+                            });
+
+                            html += "</select><textarea id='pista-" + (i + 1) + "' cols='25' rows='2' placeholder='Escribe una pista para la siguiente ubicacion...'></textarea></div></div>";
+                        }
+
+                        html += "<div class='submit'>"
+
+                        if (idYin == idCorrect && idYin != '') {
+                            html += "<button id='formulario'>Actualizar</button><button onclick='elimYincana(event, " + idCorrect + ")' >Eliminar</button></div></form></div>";
+                        } else {
+                            html += "<button>Crear</button></div></form></div>";
+                        }
+
+                        popupContent.innerHTML = html;
+
+                        removeClasses();
+                        container.style.zIndex = '999';
+                        popupContent.classList.add('visible');
+                        popupContent.classList.toggle('shifted1');
+
+                        newYincana();
+                        editYincana();
+                    }
+                };
+                ajaxExtra.send(formdata);
+
             }
         };
         ajax.send(formdata);
@@ -424,8 +462,6 @@ function updateMarcador(idMar) {
             formdata.append('catMar', catMar);
             formdata.append('idMar', idMar);
 
-            console.log(catMar)
-
             var ajax = new XMLHttpRequest();
             ajax.open('POST', '/crearMarcador');
             ajax.onload = function () {
@@ -441,8 +477,6 @@ function updateMarcador(idMar) {
                         width: "200px",
                         background: "#293A68"
                     });
-                } else {
-                    console.log(ajax.responseText)
                 }
             };
             ajax.send(formdata);
@@ -476,7 +510,6 @@ function newMarcador() {
                 var ajax = new XMLHttpRequest();
                 ajax.open('POST', '/crearMarcador');
                 ajax.onload = function () {
-                    // console.log(ajax.responseText)
                     if (ajax.status == 200) {
                         buttonClick2();
                         buttonClick2();
@@ -489,6 +522,8 @@ function newMarcador() {
                             width: "200px",
                             background: "#293A68"
                         });
+                    } else {
+                        console.log(ajax.responseText)
                     }
                 };
                 ajax.send(formdata);
@@ -554,19 +589,99 @@ function elimMarcador(event, idMar) {
 
 /* Funciones jincana */
 
+function editYincana() {
+    document.getElementById('selectYincana').addEventListener('change', function () {
+        buttonClick1();
+        buttonClick1(document.getElementById('selectYincana').value);
+    });
+
+    var updateForm = document.getElementById('updateYincana');
+    if (updateForm) {
+        updateYincana(document.getElementById('selectYincana').value);
+    }
+}
+
+function newYincana() {
+    var createForm = document.getElementById('createYincana');
+    if (createForm) {
+        document.getElementById('createYincana').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var nombreYin = document.getElementById('nameYincana').value
+
+            var marca = [
+                document.getElementById('marc-1').value,
+                document.getElementById('marc-2').value,
+                document.getElementById('marc-3').value,
+                document.getElementById('marc-4').value,
+                document.getElementById('marc-5').value
+            ];
+
+            var pista = [
+                document.getElementById('pista-1').value,
+                document.getElementById('pista-2').value,
+                document.getElementById('pista-3').value,
+                document.getElementById('pista-4').value,
+                document.getElementById('pista-5').value
+            ];
+
+            if (nombreYin == '') {
+                document.getElementById('nameYincana').style = 'background-color: pink;'
+
+                document.getElementById('ErrorYincana').style = 'color: red;'
+                document.getElementById('ErrorYincana').innerHTML = 'Introduce un valor'
+            } else {
+                var formdata = new FormData();
+                var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                formdata.append('_token', csrfToken);
+
+                formdata.append('nombreYin', nombreYin);
+
+                formdata.append('marca', marca);
+                formdata.append('pista', pista);
+
+                var ajax = new XMLHttpRequest();
+                ajax.open('POST', '/crearYincana');
+                ajax.onload = function () {
+                    if (ajax.status == 200) {
+                        if (ajax.responseText === 'error') {
+                            document.getElementById('nameYincana').style = 'background-color: pink;'
+
+                            document.getElementById('ErrorYincana').style = 'color: red;'
+                            document.getElementById('ErrorYincana').innerHTML = 'Este marcador ya existe'
+                        } else {
+                            buttonClick1();
+                            buttonClick1();
+
+                            Swal.fire({
+                                position: "top-end",
+                                icon: "success",
+                                showConfirmButton: false,
+                                timer: 1250,
+                                width: "200px",
+                                background: "#293A68"
+                            });
+                        }
+                    }
+                };
+                ajax.send(formdata);
+            }
+        })
+    }
+}
 
 
 
 /* Mapa */
 
-var map = L.map('map', {
-    zoomControl: false
-}).setView([41.3851, 2.1734], 13);
+// var map = L.map('map', {
+//     zoomControl: false
+// }).setView([41.3851, 2.1734], 13);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// }).addTo(map);
 
-L.control.zoom({
-    position: 'bottomright'
-}).addTo(map);
+// L.control.zoom({
+//     position: 'bottomright'
+// }).addTo(map);

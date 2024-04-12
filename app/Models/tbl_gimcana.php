@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbl_gimcana extends Model
 {
+    public $timestamps = false;
+    protected $primaryKey = 'id_gim';
+
     use HasFactory;
     protected $table = 'tbl_gimcana';
 }

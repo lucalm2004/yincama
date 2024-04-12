@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\tbl_gimcana;
+use App\Models\tbl_gimcana_lugare;
 use App\Models\tbl_lugar;
 use App\Models\tbl_tipo;
 use App\Models\tbl_tipo_lugar;
@@ -75,17 +76,14 @@ class adminController extends Controller
         $descripcionMar = $request->input('descripcionCat');
         $catMar = $request->input('catMar');
 
-        echo $catMar;
-
         if (!$request->input('idMar')) {
-
             $marcadores = new tbl_lugar();
             $marcadores->nombre_lug = $nombreMar;
             $marcadores->desc_lug = $descripcionMar;
 
             $marcadores->save();
 
-            $lastInsertedId = $marcadores->id;
+            $lastInsertedId = $marcadores->id_lug;
 
             $marcador_lugar = new tbl_tipo_lugar();
             $marcador_lugar->id_tipo_fk = $catMar;
@@ -120,6 +118,8 @@ class adminController extends Controller
 
             echo "modificado";
         }
+
+        echo 'awa';
     }
 
     public function elimMarcador(Request $request)
@@ -132,11 +132,15 @@ class adminController extends Controller
 
     public function selectYincana(Request $request)
     {
-        $yincana = tbl_gimcana::leftJoin('tbl_gimcana-lugares', 'tbl_gimcana.id_gim', '=', 'tbl_gimcana-lugares.id_gim_fk')
-            ->leftJoin('tbl_lugares', 'tbl_gimcana-lugares.id_lug_fk', '=', 'tbl_lugares.id_lug')
-            ->select('tbl_gimcana.*', tbl_lugar::raw('GROUP_CONCAT(tbl_lugares.nombre_lug) as lugares'))
+        $yincana = tbl_gimcana::select('tbl_gimcana.id_gim as gimcana_id', 'tbl_gimcana.nombre_gim as gimcana_nombre')
+            ->join('tbl_gimcana-lugares', 'tbl_gimcana.id_gim', '=', 'tbl_gimcana-lugares.id_gim_fk')
+            ->join('tbl_lugares', 'tbl_gimcana-lugares.id_lug_fk', '=', 'tbl_lugares.id_lug')
             ->groupBy('tbl_gimcana.id_gim', 'tbl_gimcana.nombre_gim')
-            ->get();
+            ->get([
+                'tbl_gimcana.id_gim as gimcana_id',
+                'tbl_gimcana.nombre_gim as gimcana_nombre',
+                tbl_lugar::raw('GROUP_CONCAT(CONCAT(tbl_lugares.id_lug, ": ", tbl_lugares.nombre_lug) SEPARATOR ", ") as lugares')
+            ]);
 
 
 
@@ -145,55 +149,65 @@ class adminController extends Controller
 
     public function crearYincana(Request $request)
     {
-        $nombreMar = $request->input('nombreMar');
-        $descripcionMar = $request->input('descripcionCat');
-        $catMar = $request->input('catMar');
+        $nombreYin = $request->input('nombreYin');
 
-        echo $catMar;
+        $marca = $request->input('marca');
+        $pista = $request->input('pista');
+
+        $marcadores = explode(",", $marca);
+        $pistas = explode(",", $pista);
 
         if (!$request->input('idMar')) {
+            $yincanaSearch = tbl_gimcana::where('nombre_gim', $nombreYin)->get();
 
-            $marcadores = new tbl_lugar();
-            $marcadores->nombre_lug = $nombreMar;
-            $marcadores->desc_lug = $descripcionMar;
+            if ($yincanaSearch->isEmpty()) {
+                $yincana = new tbl_gimcana();
+                $yincana->nombre_gim = $nombreYin;
 
-            $marcadores->save();
+                $yincana->save();
 
-            $lastInsertedId = $marcadores->id;
+                $lastInsertedId = $yincana->id_gim;
 
-            $marcador_lugar = new tbl_tipo_lugar();
-            $marcador_lugar->id_tipo_fk = $catMar;
-            $marcador_lugar->id_lug_fk = $lastInsertedId;
+                foreach ($marcadores as $i => $marcador) {
+                    $yincanaLugar = new tbl_gimcana_lugare();
+                    $yincanaLugar->id_gim_fk = $lastInsertedId;
+                    $yincanaLugar->id_lug_fk = $marcador;
+                    $yincanaLugar->{'pista_gim-lug'} = $pistas[$i];
 
-            $marcador_lugar->save();
+                    $yincanaLugar->save();
+                }
 
-            echo 'ok';
-        } else {
-            $idMar = $request->input('idMar');
-
-            $marcadores = tbl_lugar::where('id_lug', $idMar)->first();
-            $marcadores->nombre_lug = $nombreMar;
-            $marcadores->desc_lug = $descripcionMar;
-
-            $marcadores->save();
-
-            $marcador_lugar = tbl_tipo_lugar::where('id_lug_fk', $idMar)->first();
-
-            if ($marcador_lugar) {
-                $marcador_lugar->id_tipo_fk = $catMar;
-                $marcador_lugar->id_lug_fk = $idMar;
-
-                $marcador_lugar->save();
+                echo 'ok';
             } else {
-                $new_marcador_lugar = new tbl_tipo_lugar();
-                $new_marcador_lugar->id_tipo_fk = $catMar;
-                $new_marcador_lugar->id_lug_fk = $idMar;
-
-                $new_marcador_lugar->save();
+                echo 'error';
             }
-
-            echo "modificado";
         }
+        // } else {
+        //     $idMar = $request->input('idMar');
+
+        //     $marcadores = tbl_lugar::where('id_lug', $idMar)->first();
+        //     $marcadores->nombre_lug = $nombreMar;
+        //     $marcadores->desc_lug = $descripcionMar;
+
+        //     $marcadores->save();
+
+        //     $marcador_lugar = tbl_tipo_lugar::where('id_lug_fk', $idMar)->first();
+
+        //     if ($marcador_lugar) {
+        //         $marcador_lugar->id_tipo_fk = $catMar;
+        //         $marcador_lugar->id_lug_fk = $idMar;
+
+        //         $marcador_lugar->save();
+        //     } else {
+        //         $new_marcador_lugar = new tbl_tipo_lugar();
+        //         $new_marcador_lugar->id_tipo_fk = $catMar;
+        //         $new_marcador_lugar->id_lug_fk = $idMar;
+
+        //         $new_marcador_lugar->save();
+        //     }
+
+        //     echo "modificado";
+        // }
     }
 
     public function elimYincana(Request $request)
