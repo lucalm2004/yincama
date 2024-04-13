@@ -73,7 +73,7 @@ class adminController extends Controller
     public function crearMarcador(Request $request)
     {
         $nombreMar = $request->input('nombreMar');
-        $descripcionMar = $request->input('descripcionCat');
+        $descripcionMar = $request->input('descripcionMar');
         $catMar = $request->input('catMar');
 
         if (!$request->input('idMar')) {
@@ -132,17 +132,12 @@ class adminController extends Controller
 
     public function selectYincana(Request $request)
     {
-        $yincana = tbl_gimcana::select('tbl_gimcana.id_gim as gimcana_id', 'tbl_gimcana.nombre_gim as gimcana_nombre')
+        $yincana = tbl_gimcana::select('tbl_gimcana.id_gim', 'tbl_gimcana.nombre_gim', tbl_lugar::raw('GROUP_CONCAT(CONCAT(tbl_lugares.id_lug, ":", tbl_lugares.nombre_lug, ":", `tbl_gimcana-lugares`.`pista_gim-lug`) SEPARATOR ",") as lugares'))
             ->join('tbl_gimcana-lugares', 'tbl_gimcana.id_gim', '=', 'tbl_gimcana-lugares.id_gim_fk')
             ->join('tbl_lugares', 'tbl_gimcana-lugares.id_lug_fk', '=', 'tbl_lugares.id_lug')
             ->groupBy('tbl_gimcana.id_gim', 'tbl_gimcana.nombre_gim')
-            ->get([
-                'tbl_gimcana.id_gim as gimcana_id',
-                'tbl_gimcana.nombre_gim as gimcana_nombre',
-                tbl_lugar::raw('GROUP_CONCAT(CONCAT(tbl_lugares.id_lug, ": ", tbl_lugares.nombre_lug) SEPARATOR ", ") as lugares')
-            ]);
-
-
+            ->orderBy('tbl_lugares.id_lug')
+            ->get();
 
         return response()->json($yincana);
     }
@@ -157,7 +152,7 @@ class adminController extends Controller
         $marcadores = explode(",", $marca);
         $pistas = explode(",", $pista);
 
-        if (!$request->input('idMar')) {
+        if (!$request->input('idYin')) {
             $yincanaSearch = tbl_gimcana::where('nombre_gim', $nombreYin)->get();
 
             if ($yincanaSearch->isEmpty()) {
@@ -181,40 +176,35 @@ class adminController extends Controller
             } else {
                 echo 'error';
             }
+        } else {
+            $idYin = $request->input('idYin');
+            $nombreYin = $request->input('nombreYin');
+
+            $yincana = tbl_gimcana::where('id_gim', $idYin)->first();
+
+            $yincana->nombre_gim = $nombreYin;
+
+            $yincana->save();
+
+            tbl_gimcana_lugare::where('id_gim_fk', $idYin)->delete();
+
+            foreach ($marcadores as $i => $marcador) {
+                $yincanaLugar = new tbl_gimcana_lugare();
+                $yincanaLugar->id_gim_fk = $idYin;
+                $yincanaLugar->id_lug_fk = $marcador;
+                $yincanaLugar->{'pista_gim-lug'} = $pistas[$i];
+
+                $yincanaLugar->save();
+            }
         }
-        // } else {
-        //     $idMar = $request->input('idMar');
-
-        //     $marcadores = tbl_lugar::where('id_lug', $idMar)->first();
-        //     $marcadores->nombre_lug = $nombreMar;
-        //     $marcadores->desc_lug = $descripcionMar;
-
-        //     $marcadores->save();
-
-        //     $marcador_lugar = tbl_tipo_lugar::where('id_lug_fk', $idMar)->first();
-
-        //     if ($marcador_lugar) {
-        //         $marcador_lugar->id_tipo_fk = $catMar;
-        //         $marcador_lugar->id_lug_fk = $idMar;
-
-        //         $marcador_lugar->save();
-        //     } else {
-        //         $new_marcador_lugar = new tbl_tipo_lugar();
-        //         $new_marcador_lugar->id_tipo_fk = $catMar;
-        //         $new_marcador_lugar->id_lug_fk = $idMar;
-
-        //         $new_marcador_lugar->save();
-        //     }
-
-        //     echo "modificado";
-        // }
+        echo 'modificado';
     }
 
     public function elimYincana(Request $request)
     {
-        $idMar = $request->input('idMar');
+        $idYin = $request->input('idYin');
 
-        tbl_Lugar::where('id_lug', '=', $idMar)->delete();
-        tbl_tipo_lugar::where('id_lug_fk', '=', $idMar)->delete();
+        tbl_gimcana::where('id_gim', '=', $idYin)->delete();
+        tbl_gimcana_lugare::where('id_gim_fk', '=', $idYin)->delete();
     }
 }

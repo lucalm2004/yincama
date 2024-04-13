@@ -39,13 +39,14 @@ function buttonClick1(idYin) {
         ajax.open('POST', '/selectYincana');
         ajax.onload = function () {
 
-            console.log(ajax.responseText)
+            // console.log(ajax.responseText)
 
             if (ajax.status == 200) {
                 var json = JSON.parse(ajax.responseText);
                 var html = "<div><h3>Tus Gincanas:</h3><div class='row'><select id='selectYincana' ><option></option>";
                 var idCorrect = "";
                 var nameCorrect = "";
+                var lugaresCorrect = "";
 
                 json.forEach(function (item) {
                     if (idYin && item.id_gim == idYin && idYin != undefined) {
@@ -53,17 +54,18 @@ function buttonClick1(idYin) {
                         idCorrect = item.id_gim;
                         nameCorrect = item.nombre_gim;
 
+                        lugaresCorrect = item.lugares
                     } else {
                         html += "<option value='" + item.id_gim + "'>" + item.nombre_gim + "</option>";
                     }
                 });
 
-                html += "</select></div></div><hr><div><form id='createYincana'><span id='ErrorYincana'></span>";
+                html += "</select></div></div><hr><div>";
 
                 if (idYin == idCorrect && idYin != '') {
-                    html += "<div class='row h3-exception'><h3>Nombre: </h3><input id='nameYincana' type='text' value='" + nameCorrect + "'></div>"
+                    html += "<form id='updateYincana'><span id='ErrorYincana'></span><div class='row h3-exception'><h3>Nombre: </h3><input id='nameYincana' type='text' value='" + nameCorrect + "'></div>"
                 } else {
-                    html += "<div class='row h3-exception'><h3>Nombre: </h3><input id='nameYincana' type='text'></div>"
+                    html += "<form id='createYincana'><span id='ErrorYincana'></span><div class='row h3-exception'><h3>Nombre: </h3><input id='nameYincana' type='text'></div>"
                 }
 
                 var formdata = new FormData();
@@ -77,18 +79,30 @@ function buttonClick1(idYin) {
                         html += "<div class='locations'>"
                         var num = 5;
 
-                        // console.log(ajaxExtra.responseText)
-
                         for (var i = 0; i < num; i++) {
                             html += "<div class='row'><h3>" + (i + 1) + ":</h3><div class='row-before'><select id='marc-" + (i + 1) + "'class='row-exception'><option></option>"
 
                             var jsonExtra = JSON.parse(ajaxExtra.responseText);
 
-                            jsonExtra.forEach(function (item) {
-                                html += "<option value='" + item.id_lug + "'>" + item.nombre_lug + "</option>";
+                            if (lugaresCorrect.split(",")[i]) {
+                                var marcadores = lugaresCorrect.split(",")[i].split(":")
+                            }
+
+                            var selectedId = (marcadores && marcadores.length > 0) ? marcadores[0] : null;
+
+                            jsonExtra.forEach(function (item, i) {
+                                if (item.id_lug == selectedId) {
+                                    html += "<option value='" + item.id_lug + "' selected>" + item.nombre_lug + "</option>";
+                                } else {
+                                    html += "<option value='" + item.id_lug + "'>" + item.nombre_lug + "</option>";
+                                }
                             });
 
-                            html += "</select><textarea id='pista-" + (i + 1) + "' cols='25' rows='2' placeholder='Escribe una pista para la siguiente ubicacion...'></textarea></div></div>";
+                            if (selectedId) {
+                                html += "</select><textarea id='pista-" + (i + 1) + "' cols='25' rows='2' placeholder='Escribe una pista para la siguiente ubicacion...'>" + marcadores[2] + "</textarea></div></div>";
+                            } else {
+                                html += "</select><textarea id='pista-" + (i + 1) + "' cols='25' rows='2' placeholder='Escribe una pista para la siguiente ubicacion...'></textarea></div></div>";
+                            }
                         }
 
                         html += "<div class='submit'>"
@@ -522,8 +536,6 @@ function newMarcador() {
                             width: "200px",
                             background: "#293A68"
                         });
-                    } else {
-                        console.log(ajax.responseText)
                     }
                 };
                 ajax.send(formdata);
@@ -601,6 +613,68 @@ function editYincana() {
     }
 }
 
+function updateYincana(idYin) {
+    document.getElementById('formulario').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        var nombreYin = document.getElementById('nameYincana').value
+
+        var marca = [
+            document.getElementById('marc-1').value,
+            document.getElementById('marc-2').value,
+            document.getElementById('marc-3').value,
+            document.getElementById('marc-4').value,
+            document.getElementById('marc-5').value
+        ];
+
+        var pista = [
+            document.getElementById('pista-1').value,
+            document.getElementById('pista-2').value,
+            document.getElementById('pista-3').value,
+            document.getElementById('pista-4').value,
+            document.getElementById('pista-5').value
+        ];
+
+        if (nombreYin == '') {
+            document.getElementById('nameYincana').style = 'background-color: pink;'
+
+            document.getElementById('ErrorYincana').style = 'color: red;'
+            document.getElementById('ErrorYincana').innerHTML = 'Introduce un valor'
+        } else {
+            var formdata = new FormData();
+            var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            formdata.append('_token', csrfToken);
+
+            formdata.append('nombreYin', nombreYin);
+
+            formdata.append('marca', marca);
+            formdata.append('pista', pista);
+
+            formdata.append('idYin', idYin);
+
+            var ajax = new XMLHttpRequest();
+            ajax.open('POST', '/crearYincana');
+            ajax.onload = function () {
+                if (ajax.status == 200) {
+                    buttonClick1();
+                    buttonClick1();
+
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1250,
+                        width: "200px",
+                        background: "#293A68"
+                    });
+                }
+            };
+            ajax.send(formdata);
+
+        }
+    })
+}
+
 function newYincana() {
     var createForm = document.getElementById('createYincana');
     if (createForm) {
@@ -668,6 +742,57 @@ function newYincana() {
             }
         })
     }
+}
+
+function elimYincana(event, idYin) {
+    event.preventDefault();
+
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: "btn btn-success btn-lg",
+            cancelButton: "btn btn-danger btn-lg"
+        },
+        buttonsStyling: true
+    });
+
+    swalWithBootstrapButtons.fire({
+        title: "Seguro que quiere eliminarlo?",
+        text: "Este cambio será permanente",
+        icon: "warning",
+        color: "#fff",
+        showCancelButton: true,
+        position: "top-end",
+        cancelButtonText: "No",
+        confirmButtonText: "Si",
+        reverseButtons: true,
+        background: "#293A68"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var formdata = new FormData();
+            var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            formdata.append('_token', csrfToken);
+            formdata.append('idYin', idYin);
+
+            var ajax = new XMLHttpRequest();
+            ajax.open('POST', '/elimYincana');
+            ajax.onload = function () {
+                if (ajax.status == 200) {
+                    buttonClick1();
+                    buttonClick1();
+
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1250,
+                        width: "200px",
+                        background: "#293A68"
+                    });
+                }
+            };
+            ajax.send(formdata);
+        }
+    });
 }
 
 
