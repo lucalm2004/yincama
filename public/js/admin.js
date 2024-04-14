@@ -152,7 +152,8 @@ function buttonClick2(idMar) {
                 var nameCorrect = "";
                 var descCorrect = "";
                 var catCorrect = "";
-                var ubiCorrect = "";
+                var latCorrect = "";
+                var lonCorrect = "";
 
                 json.forEach(function (item) {
                     if (idMar && item.id_lug == idMar && idMar != undefined) {
@@ -161,7 +162,8 @@ function buttonClick2(idMar) {
                         nameCorrect = item.nombre_lug
                         descCorrect = item.desc_lug
                         catCorrect = item.id_tipo
-                        ubiCorrect = item.latitud_lug + ',' + item.longitud_lug
+                        latCorrect = item.latitud_lug
+                        lonCorrect = item.longitud_lug
 
                     } else {
                         html += "<option value='" + item.id_lug + "'>" + item.nombre_lug + "</option>";
@@ -194,7 +196,16 @@ function buttonClick2(idMar) {
                         });
                     }
 
-                    html += "</select></div><div class='row'><h3>Ubicación: </h3><button>Ver en mapa</button></div><div class='submit'>";
+                    html += "</select></div><div class='row'><h3>Ubicación: </h3><button onclick='selectInMap(event)'>Cambiar en mapa</button>";
+
+                    if (latCorrect && lonCorrect) {
+                        html += "<input id='latitud' type='hidden' value='" + latCorrect + "'><input id='longitud' type='hidden' value='" + lonCorrect + "'>";
+                    } else {
+                        html += "<input id='latitud' type='hidden'><input id='longitud' type='hidden'>";
+                    }
+
+
+                    html += "</div><div class='submit'>";
 
                     if (idMar == idCorrect && idMar != '') {
                         html += "<button id='formulario'>Actualizar</button><button onclick='elimMarcador(event, " + idCorrect + ")' >Eliminar</button></div></form></div>";
@@ -460,10 +471,13 @@ function updateMarcador(idMar) {
         e.preventDefault();
 
         var nombreMar = document.getElementById('nameMarcador').value
-        var descripcionCat = document.getElementById('descMarcador').value
+        var descripcionMar = document.getElementById('descMarcador').value
         var catMar = document.getElementById('catMarcador').value
 
-        if (nombreMar == '' || descripcionCat == '' || catMar == '') {
+        var latitud = document.getElementById('latitud').value
+        var longitud = document.getElementById('longitud').value
+
+        if (nombreMar == '' || descripcionMar == '' || catMar == '' || longitud == '' || latitud == '') {
 
             document.getElementById('ErrorMarcador').style = 'color: red;'
             document.getElementById('ErrorMarcador').innerHTML = 'Introduce todos los valores'
@@ -472,9 +486,11 @@ function updateMarcador(idMar) {
             var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             formdata.append('_token', csrfToken);
             formdata.append('nombreMar', nombreMar);
-            formdata.append('descripcionCat', descripcionCat);
+            formdata.append('descripcionMar', descripcionMar);
             formdata.append('catMar', catMar);
             formdata.append('idMar', idMar);
+            formdata.append('latitud', latitud);
+            formdata.append('longitud', longitud);
 
             var ajax = new XMLHttpRequest();
             ajax.open('POST', '/crearMarcador');
@@ -509,7 +525,10 @@ function newMarcador() {
             var descripcionMar = document.getElementById('descMarcador').value
             var catMar = document.getElementById('catMarcador').value
 
-            if (nombreMar == '' || descripcionMar == '' || catMar == '') {
+            var latitud = document.getElementById('latitud').value
+            var longitud = document.getElementById('longitud').value
+
+            if (nombreMar == '' || descripcionMar == '' || catMar == '' || longitud == '' || latitud == '') {
 
                 document.getElementById('ErrorMarcador').style = 'color: red;'
                 document.getElementById('ErrorMarcador').innerHTML = 'Introduce todos los valores'
@@ -520,6 +539,8 @@ function newMarcador() {
                 formdata.append('nombreMar', nombreMar);
                 formdata.append('descripcionMar', descripcionMar);
                 formdata.append('catMar', catMar);
+                formdata.append('latitud', latitud);
+                formdata.append('longitud', longitud);
 
                 var ajax = new XMLHttpRequest();
                 ajax.open('POST', '/crearMarcador');
@@ -596,6 +617,23 @@ function elimMarcador(event, idMar) {
 
 
 
+}
+
+function selectInMap(event) {
+    event.preventDefault();
+
+    document.getElementById('map').style.zIndex = '999';
+
+    function onMapClick(e) {
+        document.getElementById('latitud').value = e.latlng.lat;
+        document.getElementById('longitud').value = e.latlng.lng;
+
+        document.getElementById('map').style.zIndex = '0';
+
+        map.off('click', onMapClick);
+    }
+
+    map.on('click', onMapClick);
 }
 
 
@@ -799,14 +837,14 @@ function elimYincana(event, idYin) {
 
 /* Mapa */
 
-// var map = L.map('map', {
-//     zoomControl: false
-// }).setView([41.3851, 2.1734], 13);
+var map = L.map('map', {
+    zoomControl: false
+}).setView([41.3851, 2.1734], 13);
 
-// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-// }).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
 
-// L.control.zoom({
-//     position: 'bottomright'
-// }).addTo(map);
+L.control.zoom({
+    position: 'bottomright'
+}).addTo(map);

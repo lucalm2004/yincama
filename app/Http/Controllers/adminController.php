@@ -75,11 +75,16 @@ class adminController extends Controller
         $nombreMar = $request->input('nombreMar');
         $descripcionMar = $request->input('descripcionMar');
         $catMar = $request->input('catMar');
+        $latitud = $request->input('latitud');
+        $longitud = $request->input('longitud');
 
         if (!$request->input('idMar')) {
             $marcadores = new tbl_lugar();
             $marcadores->nombre_lug = $nombreMar;
             $marcadores->desc_lug = $descripcionMar;
+            $marcadores->latitud_lug = $latitud;
+            $marcadores->longitud_lug = $longitud;
+
 
             $marcadores->save();
 
@@ -98,6 +103,8 @@ class adminController extends Controller
             $marcadores = tbl_lugar::where('id_lug', $idMar)->first();
             $marcadores->nombre_lug = $nombreMar;
             $marcadores->desc_lug = $descripcionMar;
+            $marcadores->latitud_lug = $latitud;
+            $marcadores->longitud_lug = $longitud;
 
             $marcadores->save();
 
