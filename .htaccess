@@ -1,0 +1,7 @@
+# BEGIN RN PHP_VERSION
+<IfModule mime_module>
+    AddHandler application/x-httpd-alt-php82___lsphp .php
+</IfModule>
+# END RN PHP_VERSION
+#RewriteEngine On
+#RewriteRule ^(.*)$ /yinkama/public/$1 [L]

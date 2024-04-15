@@ -1,0 +1,235 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-y: hidden;
+}
+
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 0;
+}
+
+.buttons-container {
+    position: absolute;
+    height: 12%;
+    width: 100%;
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 88%;
+}
+
+.button {
+    height: 5rem;
+    width: 5rem;
+    background-color: #293A68;
+    border-radius: 1rem;
+    margin: 0 0.5rem;
+}
+
+.popup-container {
+    position: absolute;
+    z-index: 999;
+    width: 100%;
+    /* height: %; */
+    top: 12%;
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+}
+
+.popup-content {
+    background-color: #293A68;
+    width: 90vw;
+    position: relative;
+    border-radius: 1rem;
+    margin: 19px;
+    opacity: 0;
+    /* Inicialmente oculto */
+    transition: opacity 0.5s ease;
+    /* Transición de opacidad */
+}
+
+.popup-content.visible {
+    opacity: 1;
+    /* Hacer visible */
+}
+
+.popup-content::after {
+    width: 0;
+    content: "";
+    border: 15px solid transparent;
+    border-bottom-color: #293A68;
+    border-top: 0;
+    position: absolute;
+    top: -14px;
+    /* Cambiar el % para definir la posicion horizontal */
+    left: calc(10% - 15px);
+    opacity: 0;
+    /* Inicialmente oculto */
+    transition: opacity 0.5s ease;
+}
+
+.popup-content.shifted::after {
+    left: calc(50% - 15px);
+    opacity: 1;
+    /* Inicialmente oculto */
+}
+
+.popup-content.shifted1::after {
+    left: calc(25% - 15px);
+    opacity: 1;
+    /* Inicialmente oculto */
+}
+
+.popup-content.shifted2::after {
+    left: calc(75% - 15px);
+    opacity: 1;
+    /* Inicialmente oculto */
+}
+
+
+.popup-content.shifted3::after {
+    left: calc(91% - 15px);
+    opacity: 1;
+    /* Inicialmente oculto */
+}
+
+
+/* Aspecto */
+
+.popup-content {
+    color: white;
+    padding: 1rem;
+    border: none;
+}
+
+.popup-content h3 {
+    margin-bottom: 0.5rem;
+}
+
+.popup-content select {
+    background-color: #F9F7D0 !important;
+    border-radius: 5rem;
+    width: 100%;
+    height: 100%;
+}
+
+.separator {
+    margin: 1rem 0;
+}
+
+.row {
+    display: flex;
+}
+
+.row h3 {
+    margin: 0.5rem;
+}
+
+.row input {
+    border: none;
+    width: 100%;
+    margin: 0.75rem 0.75rem;
+    background-color: #F9F7D0;
+    height: 50%;
+    border-radius: 1rem;
+}
+
+.row button {
+    border: none;
+    width: 50%;
+    margin: 0.75rem 15%;
+    background-color: #F9F7D0;
+    height: 50%;
+    border-radius: 1rem;
+}
+
+.row textarea {
+    border: none;
+    background-color: #F9F7D0;
+    height: 45%;
+    width: 94%;
+    border-radius: 0.5rem;
+    resize: none;
+    overflow: scroll;
+}
+
+.h3-exception input {
+    width: 100%;
+    margin: 0.75rem 0.25rem;
+    background-color: #F9F7D0;
+    height: 50%;
+    border-radius: 1rem;
+}
+
+.h3-exception h3 {
+    margin: 0.5rem;
+    width: 35%;
+}
+
+.row-exception {
+    width: 96% !important;
+    height: 25% !important;
+    margin: 0.25rem 0;
+}
+
+.row-before {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.locations .row {
+    background-color: #2f6188;
+    border-radius: 1rem;
+    margin: 1rem 0;
+}
+
+.submit {
+    display: flex;
+    align-items: center;
+}
+
+.submit button {
+    border: none;
+    width: 50%;
+    margin: 0.75rem 0;
+    background-color: #F9F7D0;
+    height: 50%;
+    border-radius: 1rem;
+}
+
+.temp {
+    display: none;
+    z-index: 0;
+}
+
+.swal-wide {
+    width: 80px !important;
+    height: 80px !important;
+}
+
+.swal-icon--success svg {
+    width: 50px !important;
+    height: 50px !important;
+}
+
+input[type=checkbox] {
+    border: none;
+    width: 100%;
+    margin: 1rem 0 !important;
+    background-color: #F9F7D0;
+    height: 50%;
+    border-radius: 1rem;
+}
+
+.row label {
+    margin: 0.75rem 0 !important;
+}

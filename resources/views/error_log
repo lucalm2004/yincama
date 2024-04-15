@@ -1,0 +1,4 @@
+[12-Apr-2024 16:10:16 Europe/Madrid] PHP Fatal error:  Uncaught Error: Call to undefined function session() in /home/izacvard/g05.daw2j23.es/yinkama/resources/views/cliente.blade.php:2
+Stack trace:
+#0 {main}
+  thrown in /home/izacvard/g05.daw2j23.es/yinkama/resources/views/cliente.blade.php on line 2
